@@ -5,10 +5,16 @@ import {
     Tooltip,
     Checkbox,
     Button,
+    message,
 } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-const SignUp = () => {
+import { useDispatch, useSelector } from 'react-redux';
+import { REGISTER_USER_REQUEST } from '../reducer/user';
+
+const SignUp = ({ setVisible }) => {
     const [form] = Form.useForm();
+    const dispatch = useDispatch();
+    const { registerLoading, registerDone } = useSelector(state => state.user);
 
     const formItemLayout = {
         labelCol: {
@@ -35,8 +41,13 @@ const SignUp = () => {
 
 
     const onFinish = useCallback((values) => {
-        console.log(values)
-     }, []);
+        dispatch({
+            type : REGISTER_USER_REQUEST,
+            data : values
+        })
+        !registerLoading && registerDone && setVisible(false)
+        registerDone && !registerLoading && message.info('회원가입 성공')
+    }, [registerLoading]);
 
     return (
         <div>

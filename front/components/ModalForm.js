@@ -1,16 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Modal } from 'antd'
 import LoginForm from './LoginForm'
 import SignUp from './SignUp'
+import { useSelector } from 'react-redux'
 
 const ModalForm = ({ visible, setting, setVisible }) => {
-    // const [setting, setSetting] = useState('');
-
-    // useEffect(() => {
-    //     setSetting(login || signup)
-    // },[])
-
-
+    const { loginLoading, loginDone } = useSelector(state => state.user)
+  
     return (
         <Modal
         title={setting === 'SignUp' ? "회원가입" : false}
@@ -18,11 +14,12 @@ const ModalForm = ({ visible, setting, setVisible }) => {
         footer={null}
         closable={setting === 'SignUp' ? true : false }
         maskClosable={setting !== 'SignUp' ? true : false }
-        onCancel={() => {
-            setVisible(false)
-        }}
+        onCancel={useCallback(() => {
+          setting !== 'SignUp' ? (!loginLoading && setVisible(false)) :
+          setVisible(false)
+        },[loginLoading, loginDone])}
       >
-        {setting === 'Login' ? <LoginForm setVisible={setVisible}/> : <SignUp/>}
+        {setting === 'Login' ? <LoginForm setVisible={setVisible}/> : <SignUp setVisible={setVisible}/>}
       </Modal>
     )
 }

@@ -18,14 +18,15 @@ justify-content : center;
 
 `
 
-const MyLayout = () => {
+const MyLayout = ({ children }) => {
 
     return (
-        <RowStyled justify="space-between" align="middle">
+    <RowStyled justify="space-between" align="middle">
       <Col  xs={24} md={3}  span={4}>
       </Col>
       <ColStyled xs={24} md={18} span={4}>
             <NavBar/>
+            {children}
       </ColStyled>
       <Col  xs={24} md={3}  span={4}>
       </Col>

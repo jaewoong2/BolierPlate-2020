@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Checkbox, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useCallback } from 'react';
@@ -17,7 +17,6 @@ const LoginForm = ({ setVisible : LoginFinish }) => {
           data : value
       })
       loginDone && !loginLoading && LoginFinish(() => {
-          console.log('실행')
           return false
       })
   },[loginLoading, loginDone])
@@ -26,9 +25,11 @@ const LoginForm = ({ setVisible : LoginFinish }) => {
     setVisible(prev => !prev);
   })
 
-  if(loginInfo) {
+  useEffect(() => {
+    if(loginInfo?.email) {
       return <div>이미 로그인 되었습니다.</div>
   }
+  },[])
 
     return (
             <Form
