@@ -1,6 +1,6 @@
 import { takeLatest, delay, call, fork, all, put } from "redux-saga/effects"
 import { LOG_IN_REQUEST, LOG_IN_SUCCESS, LOG_IN_FAILURE,
-        LOG_OUT_REQUEST, LOG_OUT_FAILURE, LOG_OUT_SUCCESS, LOAD_USERINFO_SUCCESS, LOAD_USERINFO_FAILURE, LOAD_USERINFO_REQUEST, REGISTER_USER_REQUEST, REGISTER_USER_FAILURE, REGISTER_USER_SUCCESS
+        LOG_OUT_REQUEST, LOG_OUT_FAILURE, LOG_OUT_SUCCESS, LOAD_USERINFO_SUCCESS, LOAD_USERINFO_FAILURE, LOAD_USERINFO_REQUEST, REGISTER_USER_REQUEST, REGISTER_USER_FAILURE, REGISTER_USER_SUCCESS, UPLOAD_PROFILE_IMAGES_REQUEST, UPLOAD_PROFILE_IMAGES_SUCCESS, UPLOAD_PROFILE_IMAGES_FAILURE, LOAD_MYINFO_REQUEST, LOAD_MYINFO_SUCCESS, LOAD_MYINFO_FAILURE, CHANGE_NICKNAME_REQUEST, CHANGE_NICKNAME_SUCCESS, CHANGE_INTRODUCE_REQUEST, CHANGE_INTRODUCE_SUCCESS, CHANGE_INTRODUCE_FAILURE
 } from "../reducer/user"
 import axios from 'axios';
 
@@ -84,6 +84,30 @@ function* loadUserInfo(action) {
 function* watchLoadUserInfo() {
     yield takeLatest(LOAD_USERINFO_REQUEST, loadUserInfo);
 }
+// 내 정보 불러오기
+function loadMyInfoAPI() {
+    return axios.get('/user')
+}
+
+function* loadMyInfo() {
+    try {
+        const result = yield call(loadMyInfoAPI)
+        yield put({
+            type : LOAD_MYINFO_SUCCESS,
+            data : result.data
+        })
+    } catch (err) {
+        console.error(err)
+        yield put({
+            type : LOAD_MYINFO_FAILURE,
+            error : err.response.data
+        })
+    }
+}
+
+function* watchLoadMyInfo() {
+    yield takeLatest(LOAD_MYINFO_REQUEST, loadMyInfo);
+}
 
 //회원가입
 function registerAPI(data) {
@@ -110,11 +134,92 @@ function* watchRegister() {
     yield takeLatest(REGISTER_USER_REQUEST, register);
 }
 
+
+//프로필 이미지 업로드
+function uploadProfileImagesAPI(data) {
+    return axios.post('/user/profile', data)
+}
+
+function* uploadProfileImages(action) {
+    try {
+        const result = yield call(uploadProfileImagesAPI, action.data)
+        yield put({
+            type : UPLOAD_PROFILE_IMAGES_SUCCESS,
+            data : result.data
+        })
+    } catch (err) {
+        console.error(err)
+        yield put({
+            type : UPLOAD_PROFILE_IMAGES_FAILURE,
+            error : err.response.data
+        })
+    }
+}
+
+function* watchUploadProfileImage() {
+    yield takeLatest(UPLOAD_PROFILE_IMAGES_REQUEST, uploadProfileImages);
+}
+
+
+// 닉네임 변경 하기
+function changeNicknameAPI(data) {
+    return axios.patch('/user', data)
+}
+
+function* changeNickname(action) {
+    try {
+        const result = yield call(changeNicknameAPI, action.data)
+        yield put({
+            type : CHANGE_NICKNAME_SUCCESS,
+            data : result.data
+        })
+    } catch (err) {
+        console.error(err)
+        yield put({
+            type : CHANGE_NICKNAME_FAILURE,
+            error : err.response.data
+        })
+    }
+}
+
+function* watchChangeNickname() {
+    yield takeLatest(CHANGE_NICKNAME_REQUEST, changeNickname);
+}
+
+// 자기소개 변경 하기
+function changeIntroduceAPI(data) {
+    return axios.post('/user/introduce', data)
+}
+
+function* changeIntroduce(action) {
+    try {
+        const result = yield call(changeIntroduceAPI, action.data)
+        yield put({
+            type : CHANGE_INTRODUCE_SUCCESS,
+            data : result.data
+        })
+    } catch (err) {
+        console.error(err)
+        yield put({
+            type : CHANGE_INTRODUCE_FAILURE,
+            error : err.response.data
+        })
+    }
+}
+
+function* watchChangeIntroduce() {
+    yield takeLatest(CHANGE_INTRODUCE_REQUEST, changeIntroduce);
+}
+
 export default function* userSaga() {
     yield all([
         fork(watchLogin),
         fork(watchLogout),
         fork(watchLoadUserInfo),
         fork(watchRegister),
+        fork(watchUploadProfileImage),
+        fork(watchLoadMyInfo),
+        fork(watchChangeNickname),
+        fork(watchChangeIntroduce),
     ])
 }

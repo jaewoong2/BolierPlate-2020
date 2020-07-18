@@ -11,25 +11,29 @@ const LoginForm = ({ setVisible : LoginFinish }) => {
     const [visible, setVisible] = useState(false) 
     const dispatch = useDispatch();
 
+    useEffect(() => {
+      loginDone && !loginLoading && LoginFinish(() => {
+        return false
+    })
+    },[loginLoading, loginDone])
+
+    useEffect(() => {
+      if(loginInfo?.email) {
+        return <div>이미 로그인 되었습니다.</div>
+    }
+    },[])
   const onFinish = useCallback((value) => {
       dispatch({
           type : LOG_IN_REQUEST,
           data : value
       })
-      loginDone && !loginLoading && LoginFinish(() => {
-          return false
-      })
-  },[loginLoading, loginDone])
+  },[])
 
   const onClickModal = useCallback(() => {
     setVisible(prev => !prev);
   })
 
-  useEffect(() => {
-    if(loginInfo?.email) {
-      return <div>이미 로그인 되었습니다.</div>
-  }
-  },[])
+  
 
     return (
             <Form

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Modal } from 'antd'
+import { Modal, message } from 'antd'
 import LoginForm from './LoginForm'
 import SignUp from './SignUp'
 import { useSelector } from 'react-redux'
 
 const ModalForm = ({ visible, setting, setVisible }) => {
-    const { loginLoading, loginDone } = useSelector(state => state.user)
+    const { loginLoading, loginDone  } = useSelector(state => state.user)
   
     return (
         <Modal

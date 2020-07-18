@@ -1,4 +1,4 @@
-import React, {useCallback } from 'react';
+import React, {useCallback, useEffect, useState } from 'react';
 import {
     Form,
     Input,
@@ -11,43 +11,54 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { REGISTER_USER_REQUEST } from '../reducer/user';
 
+  
+const formItemLayout = {
+    labelCol: {
+        xs: { span: 24 },
+        sm: { span: 8 },
+    },
+    wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 16 },
+    },
+};
+const tailFormItemLayout = {
+    wrapperCol: {
+        xs: {
+            span: 24,
+            offset: 0,
+        },
+        sm: {
+            span: 16,
+            offset: 8,
+        },
+    },
+};
+
 const SignUp = ({ setVisible }) => {
     const [form] = Form.useForm();
     const dispatch = useDispatch();
-    const { registerLoading, registerDone } = useSelector(state => state.user);
+    const [mounted, setMounted] = useState(false);
+    const { registerUserLoading, registerUserDone } = useSelector(state => state.user);
 
-    const formItemLayout = {
-        labelCol: {
-            xs: { span: 24 },
-            sm: { span: 8 },
-        },
-        wrapperCol: {
-            xs: { span: 24 },
-            sm: { span: 16 },
-        },
-    };
-    const tailFormItemLayout = {
-        wrapperCol: {
-            xs: {
-                span: 24,
-                offset: 0,
-            },
-            sm: {
-                span: 16,
-                offset: 8,
-            },
-        },
-    };
-
-
+    // useEffect(() => {
+    //     !registerUserLoading && registerUserDone && setVisible(false)
+    //     registerUserDone && !registerUserLoading && message.info('회원가입 성공')
+    //   },[registerUserLoading, registerUserDone])
+      
     const onFinish = useCallback((values) => {
         dispatch({
             type : REGISTER_USER_REQUEST,
             data : values
         })
-        !registerLoading && registerDone && setVisible(false)
-        registerDone && !registerLoading && message.info('회원가입 성공')
-    }, [registerLoading]);
+        setMounted(true)
+        
+    }, []);
+
+    useEffect(() => {
+        mounted && !registerUserLoading && setVisible(false)
+        mounted && !registerUserLoading && message.info('회원가입 성공')
+    },[registerUserLoading, registerUserDone, mounted])
 
     return (
         <div>
@@ -141,7 +152,7 @@ const SignUp = ({ setVisible }) => {
                     </Checkbox>
                 </Form.Item>
                 <Form.Item {...tailFormItemLayout}>
-                    <Button type="primary" htmlType="submit">
+                    <Button loading={registerUserLoading} type="primary" htmlType="submit">
                         회원가입
         </Button>
                 </Form.Item>
