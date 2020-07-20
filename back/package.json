@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "dev" : "nodemon"
+    "dev": "nodemon"
   },
   "author": "jaewoong2",
   "license": "ISC",
@@ -23,6 +23,7 @@
     "mysql2": "^2.1.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
+    "sanitize-html": "^1.27.1",
     "sequelize": "^6.1.0",
     "sequelize-cli": "^5.5.1"
   },

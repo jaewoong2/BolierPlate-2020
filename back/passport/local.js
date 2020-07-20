@@ -21,7 +21,7 @@ module.exports = () => {
             if(result) {
                 return done(null, user);
             }
-            return done(null, fasle, { reason : '비밀번호가 틀렸습니다'})
+            return done(null, false, { reason : '비밀번호가 틀렸습니다'})
         } catch(err) {
             console.error(err)
             return done(err)
