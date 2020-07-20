@@ -41,9 +41,10 @@ router.post('/', removeHtmlAndShorten ,async (req, res, next) => {
         }
         const post = await Post.create({
             title : req.body.title,
-            content : req.body.content,
+            content : req.filtered,
             UserId : req.user.id
         });
+        
         if(req.body.image) {
             if( Array.isArray(req.body.image)) { // 이미지를 여러개 올리면 images = [asd.png, ggr.png]
                const images = await Promise.all(req.body.image.map((image) => {

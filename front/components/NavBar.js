@@ -6,6 +6,12 @@ import ModalForm from "./ModalForm";
 import Router, { useRouter } from 'next/router'
 import { useDispatch, useSelector } from "react-redux";
 import { LOG_OUT_REQUEST } from "../reducer/user";
+import styled from "styled-components";
+
+const DivWrapper = styled.div`
+  position : sticky;
+  top : 0;
+`
 
 const NavBar = () => {
     const [current, setCurrent] = useState("");
@@ -48,8 +54,9 @@ const NavBar = () => {
     Router.push('/profile')
   },[])
   return (
+<DivWrapper>
     <Menu
-      style={{backgroundColor: "#f5f0f0b0", boxShadow : '0px 15px 10px -15px #111', marginBottom : '10px' }}
+      style={{backgroundColor: "#f5f0f0", boxShadow : '0px 15px 10px -15px #111', marginBottom : '10px', position : 'sticky'}}
       onClick={handleClick}
       overflowedIndicator={null}
       // selectedKeys={[current]}
@@ -73,6 +80,7 @@ const NavBar = () => {
         {visible && <ModalForm setting={setting} setVisible={setVisible} visible={visible}/>}
         {visible && <ModalForm setting={setting} setVisible={setVisible} visible={visible}/>}
     </Menu>
+    </DivWrapper>
   );
 };
 

@@ -29,6 +29,7 @@ exports.removeHtmlAndShorten = (req, res, next) => {
         ...sanitizeOption
     });
     filtered.length < 200 ? filtered : `${filtered.slice(0, 200)}...`
+    console.log(filtered)
     req.filtered = filtered;
     next();
 }
