@@ -137,7 +137,7 @@ const profile = () => {
 
    
     return (
-        <MyLayout >
+        <MyLayout>
             <div>
             <StyleDiv>
                 <Form encType="multipart/form-data">

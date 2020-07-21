@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { LOAD_MYINFO_REQUEST } from '../reducer/user';
 import { LOAD_MYPOST_REQUEST } from '../reducer/post';
+import React, { useEffect } from 'react'
 import styled from 'styled-components';
 import { Avatar } from 'antd';
 
@@ -14,7 +14,7 @@ const CenterdDiv = styled.div`
 
 const PostViewerBlock = styled.div`
   margin-top: 2rem;
-  border : 0.5px solid #7a4cb662;
+  border : 0.5px solid #4e4c2e2d;
   width : 80%;
   &:hover {
     -moz-box-shadow: 0 15px 10px #777;

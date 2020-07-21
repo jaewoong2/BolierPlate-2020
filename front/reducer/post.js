@@ -13,7 +13,7 @@ const initialState = {
   uploadImagesDone: false,
   uploadImagesError: null,
 
-  ImagePaths : [],
+  ImagePaths: [],
   myPost: [],
 };
 
@@ -25,9 +25,9 @@ export const LOAD_MYPOST_REQUEST = "LOAD_MYPOST_REQUEST";
 export const LOAD_MYPOST_SUCCESS = "LOAD_MYPOST_SUCCESS";
 export const LOAD_MYPOST_FAILURE = "LOAD_MYPOST_FAILURE";
 
-export const UPLOAD_IMAGES_SUCCESS = 'UPLOAD_IMAGES_SUCCESS'
-export const UPLOAD_IMAGES_FAILURE = 'UPLOAD_IMAGES_FAILURE'
-export const UPLOAD_IMAGES_REQUEST = 'UPLOAD_IMAGES_REQUEST'
+export const UPLOAD_IMAGES_SUCCESS = "UPLOAD_IMAGES_SUCCESS";
+export const UPLOAD_IMAGES_FAILURE = "UPLOAD_IMAGES_FAILURE";
+export const UPLOAD_IMAGES_REQUEST = "UPLOAD_IMAGES_REQUEST";
 
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
@@ -47,38 +47,38 @@ const reducer = (state = initialState, action) => {
         draft.wrtieError = action.error;
         break;
 
-        case LOAD_MYPOST_REQUEST:
-            draft.loadMyPostLoading = true;
-            draft.loadMyPostDone = false;
-            draft.loadMyPostError = null;
-            break;
-          case LOAD_MYPOST_SUCCESS:
-            draft.loadMyPostLoading = false;
-            draft.loadMyPostDone = true;
-            draft.myPost = action.data;
-            break;
-          case LOAD_MYPOST_FAILURE:
-            draft.loadMyPostLoading = false;
-            draft.loadMyPostDone = true;
-            draft.loadMyPostError = action.error;
-            break;
+      case LOAD_MYPOST_REQUEST:
+        draft.loadMyPostLoading = true;
+        draft.loadMyPostDone = false;
+        draft.loadMyPostError = null;
+        break;
+      case LOAD_MYPOST_SUCCESS:
+        draft.loadMyPostLoading = false;
+        draft.loadMyPostDone = true;
+        draft.myPost = action.data;
+        break;
+      case LOAD_MYPOST_FAILURE:
+        draft.loadMyPostLoading = false;
+        draft.loadMyPostDone = true;
+        draft.loadMyPostError = action.error;
+        break;
 
-            case UPLOAD_IMAGES_REQUEST:
-                draft.uploadImagesLoading = true;
-                draft.uploadImagesDone = false;
-                draft.uploadImagesError = null;
-                break;
-              case UPLOAD_IMAGES_SUCCESS:
-                draft.uploadImagesLoading = false;
-                draft.uploadImagesDone = true;
-                draft.ImagePaths = draft.ImagePaths.concat(action.data)
-                break;
-              case UPLOAD_IMAGES_FAILURE:
-                draft.uploadImagesLoading = false;
-                draft.uploadImagesDone = true;
-                draft.uploadImagesError = action.error;
-                break;
-            
+      case UPLOAD_IMAGES_REQUEST:
+        draft.uploadImagesLoading = true;
+        draft.uploadImagesDone = false;
+        draft.uploadImagesError = null;
+        break;
+      case UPLOAD_IMAGES_SUCCESS:
+        draft.uploadImagesLoading = false;
+        draft.uploadImagesDone = true;
+        draft.ImagePaths = draft.ImagePaths.concat(action.data);
+        break;
+      case UPLOAD_IMAGES_FAILURE:
+        draft.uploadImagesLoading = false;
+        draft.uploadImagesDone = true;
+        draft.uploadImagesError = action.error;
+        break;
+
       default:
         break;
     }

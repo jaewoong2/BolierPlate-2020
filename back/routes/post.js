@@ -110,4 +110,33 @@ router.get('/', removeHtmlAndShorten, async (req, res, next) => {
     }
 })
 
+
+router.get('/:postId',  async (req, res, next) => {
+    try {
+        const fullPost = await Post.findOne({
+            where : {id : req.params.postId},
+            include : [{
+                model : Image,
+            }, {
+                model : Comment,
+                Include : [{
+                    model : User,
+                    attributes : ['id', 'nickname']
+                }]
+            }, {
+                model : User,
+                attributes : ['id', 'nickname'],
+                include : [{
+                    model : Image,
+                    attributes : ['src']
+                }]
+            }]
+        })
+        res.status(201).json(fullPost)
+    } catch(err) {
+        console.error(err)
+        next(err)
+    }
+})
+
 module.exports = router;

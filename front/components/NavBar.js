@@ -11,6 +11,7 @@ import styled from "styled-components";
 const DivWrapper = styled.div`
   position : sticky;
   top : 0;
+  z-index : 3;
 `
 
 const NavBar = () => {
@@ -53,10 +54,11 @@ const NavBar = () => {
   const onClickProfile = useCallback(() => {
     Router.push('/profile')
   },[])
+
   return (
 <DivWrapper>
     <Menu
-      style={{backgroundColor: "#f5f0f0", boxShadow : '0px 15px 10px -15px #111', marginBottom : '10px', position : 'sticky'}}
+      style={{backgroundColor: "white", boxShadow : '0px 15px 10px -15px #111', marginBottom : '10px', position : 'sticky'}}
       onClick={handleClick}
       overflowedIndicator={null}
       // selectedKeys={[current]}

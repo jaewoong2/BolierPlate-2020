@@ -13,7 +13,7 @@ const booilerPlate = ({Component, pageProps}) => {
             <meta charSet="utf-8"></meta>
             <title>Woong'S-page</title>
         </Head>
-        <main>
+        <main style={{ backgroundColor : '#6868dac0'}}>
             <Component {...pageProps}/>
         </main>
       

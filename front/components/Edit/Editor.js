@@ -56,7 +56,7 @@ const Editor = () => {
   const [images, setImages] = useState(ImagePaths)
 
   const dispatch = useDispatch();
-    const Quill = typeof window === 'object' ? require('quill') : () => false;
+  const Quill = typeof window === 'object' ? require('quill') : () => false;
   
     const imageRef = useRef();
     const quillElement = useRef(null); // Quill을 적용할 DivElement를 설정
@@ -165,7 +165,7 @@ const Editor = () => {
             <TitleInput value={title} onChange={onChagneTitle} placeholder='효림이 바보'/>
             {memoDiv}
             <Button onClick={onClickWriteBtn} style={{ float : 'right', marginTop : 10 }} type="primary">올리기</Button>
-              <input hidden type="file" onChange={onChangeImageInput} ref={imageRef}/>
+            <input hidden type="file" onChange={onChangeImageInput} ref={imageRef}/>
               </Form>
         </QuillWrapper>
         </DivWrapper>
