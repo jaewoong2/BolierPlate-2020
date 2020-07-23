@@ -78,10 +78,67 @@ router.post('/', removeHtmlAndShorten ,async (req, res, next) => {
     }
 })
 
-router.get('/', removeHtmlAndShorten, async (req, res, next) => {
+router.patch('/', removeHtmlAndShorten ,async (req, res, next) => {
     try {
         if(!req.user) {
             return res.status(403).send('로그인 하지 않았습니다')
+        }
+        const post = await Post.findOne({
+            where : req.body.id,
+            UserId : req.user.id
+        })
+        if(!post) {
+            return res.status(403).send('접근 할 수 없는 게시물')
+        }
+        await Post.update({
+            title : req.body.title,
+            content : req.filtered,
+        }, {
+             where : { id : post.id } 
+        }
+        );
+        
+        if(req.body.image) {
+            await Image.destroy({
+                where : { PostId :  req.body.id  }
+            });
+            if( Array.isArray(req.body.image)) { // 이미지를 여러개 올리면 images = [asd.png, ggr.png]
+               const images = await Promise.all(req.body.image.map((image) => {
+                    return Image.create({ src : image });
+                }))
+                await post.addImages(images);
+            } else { //이미지를 하나만 올리면 image : asd.png
+                const image = await Image.create({ src : req.body.image });
+                await post.addImages(image)
+            }
+        }
+        const fullPost = await Post.findOne({
+            where : {id :  req.body.id  },
+            include : [{
+                model : Image,
+            }, {
+                model : Comment,
+                Include : [{
+                    model : User,
+                    attributes : ['id', 'nickname']
+                }]
+            }, {
+                model : User,
+                attributes : ['id', 'nickname']
+            }]
+        })
+        res.status(201).json(fullPost)
+    } catch(err) {
+        console.error(err)
+        next(err)
+    }
+})
+
+
+router.get('/', removeHtmlAndShorten, async (req, res, next) => {
+    try {
+        if(!req.user) {
+            return res.status(403).json({error : '로그인 하지 않았습니다'})
         }
         const fullPost = await Post.findAll({
             where : {UserId : req.user.id},
@@ -134,6 +191,34 @@ router.get('/:postId',  async (req, res, next) => {
         })
         res.status(201).json(fullPost)
     } catch(err) {
+        console.error(err)
+        next(err)
+    }
+})
+
+
+router.delete('/:PostId', async(req, res, next) => {
+    try {
+        if(!req.user) {
+            return res.status(403).send('로그인 하지 않은 유저')
+        }
+        const post = await Post.findOne({
+            where : { 
+                id : req.params.PostId,
+                UserId : req.user.id,
+            }
+        });
+        if(!post) {
+            return res.status(403).send('존재하지 않는 글')
+        }
+        await Post.destroy({
+            where : {
+                id : req.params.PostId,
+                UserId : req.user.id,
+            },
+        });
+        res.status(201).json({ PostId : parseInt(req.params.PostId, 10)});
+    } catch (err) {
         console.error(err)
         next(err)
     }

@@ -6,7 +6,6 @@ export default class MyDocument extends Document {
     static async getInitialProps(context) {
         const sheet = new ServerStyleSheet();
         const originalRenderPage = context.renderPage;
-
         try {
             context.renderPage = () => originalRenderPage({
                 enhanceApp : (App) => (props) => sheet.collectStyles(<App {...props}/>)

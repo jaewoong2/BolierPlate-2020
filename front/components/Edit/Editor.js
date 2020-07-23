@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, memo, useMemo } from 'react'
 import styled from 'styled-components';
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { WRTIE_REQUEST, UPLOAD_IMAGES_REQUEST } from '../../reducer/post';
 import { LOAD_MYINFO_REQUEST } from '../../reducer/user';
@@ -48,9 +48,10 @@ const DivWrapper = styled.div`
 `
 
 
-const Editor = () => {
-
+const Editor = ({ data }) => {
   const { wrtieLoading, wrtieDone, ImagePaths } = useSelector((state) => state.post)
+  const { loginInfo } = useSelector((state) => state.user)
+  
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [images, setImages] = useState(ImagePaths)
@@ -59,9 +60,23 @@ const Editor = () => {
   const Quill = typeof window === 'object' ? require('quill') : () => false;
   
     const imageRef = useRef();
-    const quillElement = useRef(null); // Quill을 적용할 DivElement를 설정
-    const quillInstance = useRef(null); // Quill 인스턴스를 설정
+    const quillElement = useRef(); // Quill을 적용할 DivElement를 설정
+    const quillInstance = useRef(); // Quill 인스턴스를 설정
   
+    // if(data.UserId !== loginInfo.id) {
+    //   return <div>접근할 수 없는 페이지</div>
+    // }
+
+    useEffect(() => { // 수정!
+      if(quillInstance?.current?.root) {
+        if(data) {
+          setTitle(data.title)
+          setContent(data.content)
+          quillInstance.current.root.innerHTML = data.content
+        }
+      }
+    },[data, quillInstance?.current?.root])
+
     useEffect(() => { // 글 쓰면 초기화
       if(!wrtieLoading && wrtieDone) { 
         setTitle('');
@@ -69,6 +84,17 @@ const Editor = () => {
         quillInstance.current.root.innerHTML = '';
       }
     },[wrtieLoading, wrtieDone])
+    
+    useEffect(() =>{
+      if(title.lnegth > 200) {
+        message.warn('제목의 길이가 너무 길어요..')
+        setTitle(prev => {
+          const returnTitle = prev.slice(0,19);
+          return returnTitle;
+        })
+      }
+    },[title])
+
 
     useEffect(() => { // 글 쓰면 초기화
       if(images !== ImagePaths) {
@@ -132,15 +158,28 @@ const Editor = () => {
     })
     
     const onClickWriteBtn = useCallback(() => {
-      dispatch({
-        type : WRTIE_REQUEST,
-        data : {
-          title : title,
-          content : content,
-          image : ImagePaths
-        }
-      })
-    },[title, content, ImagePaths])
+      if(!data) {
+        dispatch({
+          type : WRTIE_REQUEST,
+          data : {
+            title : title,
+            content : content,
+            image : ImagePaths
+          }
+        })
+      } else {
+        dispatch({ // 수정
+          type : WRTIE_REQUEST,
+          data : {
+            id : data.id,
+            title : title,
+            content : content,
+            image : [...ImagePaths, ...data.Images],
+            edit : true,
+          }
+        })
+      }
+    },[title, content, ImagePaths, data])
     
     const onClickImageBtn = useCallback(() => {
       imageRef.current.click()
@@ -164,6 +203,7 @@ const Editor = () => {
             <Form encType="multipart/form-data">
             <TitleInput value={title} onChange={onChagneTitle} placeholder='효림이 바보'/>
             {memoDiv}
+            <Input prefix={<div style={{ borderRight :'2px dashed blue' , paddingRight : '10px',color : 'green'}}>해쉬태그</div>}></Input>
             <Button onClick={onClickWriteBtn} style={{ float : 'right', marginTop : 10 }} type="primary">올리기</Button>
             <input hidden type="file" onChange={onChangeImageInput} ref={imageRef}/>
               </Form>

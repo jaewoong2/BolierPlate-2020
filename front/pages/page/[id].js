@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import Router, { useRouter } from 'next/router';
 import useSWR from 'swr';
 import axios from 'axios';
@@ -7,6 +7,8 @@ import moment from 'moment';
 import 'moment/locale/ko'
 import styled from 'styled-components';
 import { message } from 'antd';
+import { useDispatch } from 'react-redux';
+import { DELETE_POST_REQUEST } from '../../reducer/post';
 
 const Containertitle = styled.div`
     display : flex;
@@ -18,7 +20,7 @@ const Containertitle = styled.div`
 
 const DivContainer = styled.div`
     display : flex;
-    justify-content : space-between;
+    justify-content : flex-end;
     padding-left : 5%;
     padding-right : 5%;
 `
@@ -27,7 +29,7 @@ const PostContent = styled.div`
   font-size: 1.3125rem;
   color: #434343;
   overflow : auto;
-  padding-top : 5%;
+  padding-top : 3%;
   padding-left : 9%;
   padding-right : 9%;
   
@@ -71,14 +73,24 @@ const QuillStyleDiv = styled.div`
         padding-left: 16px;
     }
 `
-
+const DivEdit = styled.div`
+display : flex; 
+color : #777;
+justify-content : flex-end;
+ margin : 10px 5vw 0px 0px;
+ 
+ p {
+     cursor: pointer;
+     margin : 2px;
+ }
+`
 
 moment.locale('ko')
 const fetcher = (url) => axios.get(url, { withCredentials: true })
     .then((result) => result.data);
 
 const page = () => {
-
+    const dispatch = useDispatch();
     const router = useRouter();
     const { id } = router.query;
     const { data, error } = useSWR(`http://localhost:3055/post/${id}`, fetcher);
@@ -91,13 +103,23 @@ const page = () => {
         console.log(data)
     },[data, error])
     
+  const deletePost = useCallback((id) => () => {
+    dispatch({
+      type : DELETE_POST_REQUEST,
+      data : {
+        id
+      }
+    })
+  },[])
+
+    
     return (
         <MyLayout>
            {data ? <div>
             <Containertitle><h1 style={{ fontSize : '50px'}}>{data?.title}</h1></Containertitle>
             <DivContainer>
-            <p style={{ backgroundColor : '#777', fontWeight :'200', color : 'white' }} className="moment">{moment(data?.createdAt).fromNow()}</p>
     <div style={{ display : 'flex'}}>
+            <p style={{ backgroundColor : '#777', fontWeight :'200', color : 'white', marginRight : '5px', }} className="moment">{moment(data?.createdAt).fromNow()}</p>
             <p style={{ display : 'flex', alignItems : 'center', marginRight : '10px'}}>{data?.User?.nickname}</p>
             <img style={{width : "32px", height:'32px', borderRadius : '50%' }}  src={`http://localhost:3055/${data?.User?.Images[0]?.src}`}/>
     </div>
@@ -105,6 +127,11 @@ const page = () => {
             <BorderDiv>
                <div className="bode"/>
             </BorderDiv>
+                <DivEdit style={{display : 'flex', color : '#777', justifyContent : 'flex-end', margin : '10px 5vw 0px 0px'}}>
+                    <p onClick={() => Router.replace(`/write?PostId=${data.id}`)}>수정</p>
+                    <p>/</p>
+                    <p onClick={deletePost(data.id)}>삭제</p>
+                </DivEdit>
             <PostContent>
             <QuillStyleDiv dangerouslySetInnerHTML={{__html : data?.content}}/>
             </PostContent>

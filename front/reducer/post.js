@@ -12,6 +12,10 @@ const initialState = {
   uploadImagesLoading: false,
   uploadImagesDone: false,
   uploadImagesError: null,
+  
+  deletePostLoading : false,
+  deletePostDone : false,
+  deletePostError: null,
 
   ImagePaths: [],
   myPost: [],
@@ -28,6 +32,10 @@ export const LOAD_MYPOST_FAILURE = "LOAD_MYPOST_FAILURE";
 export const UPLOAD_IMAGES_SUCCESS = "UPLOAD_IMAGES_SUCCESS";
 export const UPLOAD_IMAGES_FAILURE = "UPLOAD_IMAGES_FAILURE";
 export const UPLOAD_IMAGES_REQUEST = "UPLOAD_IMAGES_REQUEST";
+
+export const DELETE_POST_REQUEST = 'DELETE_POST_REQUEST'
+export const DELETE_POST_SUCCESS = 'DELETE_POST_SUCCESS'
+export const DELETE_POST_FAILURE = 'DELETE_POST_FAILURE'
 
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
@@ -60,6 +68,7 @@ const reducer = (state = initialState, action) => {
       case LOAD_MYPOST_FAILURE:
         draft.loadMyPostLoading = false;
         draft.loadMyPostDone = true;
+        draft.myPost = [];
         draft.loadMyPostError = action.error;
         break;
 
@@ -78,6 +87,25 @@ const reducer = (state = initialState, action) => {
         draft.uploadImagesDone = true;
         draft.uploadImagesError = action.error;
         break;
+
+
+      case DELETE_POST_REQUEST:
+        draft.deletePostLoading = true;
+        draft.deletePostDone = false;
+        draft.deletePostError = null;
+        break;
+      case DELETE_POST_SUCCESS:
+        draft.deletePostLoading = false;
+        draft.deletePostDone = true;
+        draft.myPost = draft.myPost.filter(v => v.id !== action.data.PostId);
+        break;
+      case DELETE_POST_FAILURE:
+        draft.deletePostLoading = false;
+        draft.deletePostDone = true;
+        draft.deletePostError = action.error;
+        break;
+  
+      
 
       default:
         break;
