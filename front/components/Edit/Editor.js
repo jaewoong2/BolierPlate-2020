@@ -1,9 +1,20 @@
 import React, { useState, useRef, useEffect, useCallback, memo, useMemo } from 'react'
 import styled from 'styled-components';
-import { Button, Form, Input, message } from 'antd';
+import { Button, Form, Input, message, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { WRTIE_REQUEST, UPLOAD_IMAGES_REQUEST } from '../../reducer/post';
+import { CloseOutlined, CloseCircleFilled, MinusCircleFilled, MinusOutlined, FileSearchOutlined } from '@ant-design/icons';
 import { LOAD_MYINFO_REQUEST } from '../../reducer/user';
+import UseInput from '../../Hooks/UseInput';
+import Router from 'next/router';
+
+const searchSrc = (root) => {
+  const arr1 = root.split('img').map(v => v.includes('src') === true && v.split("src="));
+  const arr2 = arr1.map(v => v && v[1]?.split("></p"))
+  return arr2.map(v => v && v[0].slice(1, v[0]?.length - 1)).filter(v => v !== false);
+}
+
+
 const TitleInput = styled.input`
   font-size: 2.3rem;
   outline: none;
@@ -47,25 +58,99 @@ const DivWrapper = styled.div`
     justify-content : center;
 `
 
+function DataURIToBlob(dataURI) {
+  const splitDataURI = dataURI.split(',')
+  const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
+  const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
+  const ia = new Uint8Array(byteString.length)
+  for (let i = 0; i < byteString.length; i++)
+      ia[i] = byteString.charCodeAt(i)
+
+  return new Blob([ia], { type: mimeString })
+}
+
+function Base64toServerImage(fullstring) {
+  const changeStr = fullstring.split('>').map(v => { 
+    if(v.includes("<p")) {
+     return v + '>'
+   } else if(v.includes("</p")) {
+   return v + '>'
+   } else if(v.includes("<img")) {
+     if(v.length > 2000) {
+      return false
+     } return v + '>'
+   } else {
+   return false
+   } } ).filter(v => v !== false).join('')
+
+   return changeStr
+}
+
 
 const Editor = ({ data }) => {
-  const { wrtieLoading, wrtieDone, ImagePaths } = useSelector((state) => state.post)
-  const { loginInfo } = useSelector((state) => state.user)
+  const { wrtieLoading, wrtieDone, ImagePaths, uploadImagesDone } = useSelector((state) => state.post)
+  const { loginInfo, loadUserInfoLoading, loadUserInfoDone } = useSelector((state) => state.user)
   
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [images, setImages] = useState(ImagePaths)
+  const [hashtag, setHashtag, hashtagChange] = UseInput('');
+  const [hashtagArr, setHashtagArr] = useState([]);
 
   const dispatch = useDispatch();
   const Quill = typeof window === 'object' ? require('quill') : () => false;
-  
+
     const imageRef = useRef();
     const quillElement = useRef(); // Quill을 적용할 DivElement를 설정
     const quillInstance = useRef(); // Quill 인스턴스를 설정
   
-    // if(data.UserId !== loginInfo.id) {
-    //   return <div>접근할 수 없는 페이지</div>
-    // }
+    useEffect(() => {
+      if(data && loginInfo) {
+        if(data.User.id && loginInfo.id) {
+          if(data?.User?.id !== loginInfo?.id) {
+            message.warn('접근할 수 없는 페이지...')
+            Router.back()
+          } 
+        }
+      }
+      if(data === null) {
+        message.warn('존재하지 않는 게시글...')
+        Router.back()
+      }
+      if(loadUserInfoDone && !loadUserInfoLoading && !loginInfo.id) {
+          message.warn('접근할 수 없는 페이지...')
+          Router.back()
+      }
+    },[data, loginInfo, loadUserInfoDone, loadUserInfoLoading])
+
+
+   
+    useEffect(() => { // 수정!
+      if(quillInstance?.current?.root) {
+        searchSrc(quillInstance?.current?.root?.innerHTML).map((v, i) => { 
+          if(v?.length > 1000) {
+              const imgBase64 = v;
+              const file = DataURIToBlob(imgBase64);
+              const formData = new FormData();
+              const nameMaking = `${Math.floor(Math.random() * 3000)}` + '_' + `${new Date().getTime()}`;
+              formData.append('image', file, nameMaking);
+              dispatch({
+                type : UPLOAD_IMAGES_REQUEST,
+                data : formData
+            })
+          }
+        })
+        if(ImagePaths) {
+          searchSrc(quillInstance?.current?.root?.innerHTML).map((v, i) => {
+            if(v?.length > 1000) {
+              const innerHTML = Base64toServerImage(quillInstance?.current?.root?.innerHTML);
+              quillInstance.current.root.innerHTML = innerHTML;
+            }
+          })
+        }
+      }
+    },[data, quillInstance?.current?.root?.innerHTML, ImagePaths])
+
 
     useEffect(() => { // 수정!
       if(quillInstance?.current?.root) {
@@ -81,7 +166,7 @@ const Editor = ({ data }) => {
       if(!wrtieLoading && wrtieDone) { 
         setTitle('');
         setContent('');
-        quillInstance.current.root.innerHTML = '';
+        quillInstance.current.root.innerHTML = '<p></br></p>';
       }
     },[wrtieLoading, wrtieDone])
     
@@ -127,8 +212,6 @@ const Editor = ({ data }) => {
         theme: 'snow',
         placeholder: '내용을 작성하세요...',
         modules: {
-          // 더 많은 옵션
-          // https://quilljs.com/docs/modules/toolbar/ 참고
           toolbar: [
             [{ header: '1' }, { header: '2' }],
             ['bold', 'italic', 'underline', 'strike'],
@@ -138,20 +221,22 @@ const Editor = ({ data }) => {
         },
       });
       const quill = quillInstance.current;
+
       quill.on('text-change', (delta, oldDelta, source) => {
         if(source === 'user') {
          setContent(quill.root.innerHTML);
-         console.log(quill.root.innerHTML)
         }
       });
       const toolbar = quill.getModule('toolbar');
       toolbar.addHandler('image', onClickImageBtn)
+
+      const clipboard = quill.getModule('clipboard');
+      clipboard.addHandler
     }, []);
 
     const onChagneTitle = useCallback((e) => {
         setTitle(e.target.value)
     },[])
-
    
     const memoDiv = useMemo(() => {
       return <div ref={quillElement}></div>
@@ -164,7 +249,8 @@ const Editor = ({ data }) => {
           data : {
             title : title,
             content : content,
-            image : ImagePaths
+            image : searchSrc(quillInstance?.current?.root?.innerHTML),
+            hashtag : hashtagArr
           }
         })
       } else {
@@ -174,12 +260,13 @@ const Editor = ({ data }) => {
             id : data.id,
             title : title,
             content : content,
-            image : [...ImagePaths, ...data.Images],
+            image : searchSrc(quillInstance?.current?.root?.innerHTML),
             edit : true,
+            hashtag : hashtagArr
           }
         })
       }
-    },[title, content, ImagePaths, data])
+    },[title, content, ImagePaths, data, hashtagArr])
     
     const onClickImageBtn = useCallback(() => {
       imageRef.current.click()
@@ -188,6 +275,7 @@ const Editor = ({ data }) => {
   const onChangeImageInput = useCallback((e) => {
       const imageFormData = new FormData();
       [].forEach.call(e.target.files, (f) => {
+          console.log(imageFormData)
           imageFormData.append('image', f)
       });
       dispatch({
@@ -196,17 +284,42 @@ const Editor = ({ data }) => {
       })
   },[])
 
+  const hashtagRegister = useCallback(() => {
+    setHashtagArr(prev => {
+      const newArr = prev.concat(hashtag)
+      return newArr
+    })
+    setHashtag('');
+  },[hashtag])
+
   
+  const cancelHash = useCallback((idx) => () => {
+      setHashtagArr(prev => {
+       const newArr = prev.filter((v, i) => i !== idx);
+       return newArr
+      })
+  })
+
+
     return (
         <DivWrapper>
         <QuillWrapper>
             <Form encType="multipart/form-data">
             <TitleInput value={title} onChange={onChagneTitle} placeholder='효림이 바보'/>
             {memoDiv}
-            <Input prefix={<div style={{ borderRight :'2px dashed blue' , paddingRight : '10px',color : 'green'}}>해쉬태그</div>}></Input>
+            <Input
+            onPressEnter={hashtagRegister}
+            value={hashtag}
+            onChange={hashtagChange}
+            suffix={<Button  onClick={hashtagRegister} type="primary">등록</Button>}
+            style={{ width :'300px', marginTop : 10}}
+            prefix={<div style={{ borderRight :'2px solid blue' , paddingRight : '10px',color : 'green', marginRight : '5px'}}>
+              해쉬태그</div>}>
+              </Input>
             <Button onClick={onClickWriteBtn} style={{ float : 'right', marginTop : 10 }} type="primary">올리기</Button>
             <input hidden type="file" onChange={onChangeImageInput} ref={imageRef}/>
               </Form>
+            {hashtagArr?.map((v, i) => <Typography.Text code>{v}<MinusOutlined onClick={cancelHash(i)} style={{ marginLeft : 4, color : '#0c0101'}} /></Typography.Text>)}
         </QuillWrapper>
         </DivWrapper>
     )

@@ -17,6 +17,10 @@ const initialState = {
   deletePostDone : false,
   deletePostError: null,
 
+  hashtagSearchLoading : false,
+  hashtagSearchDone : false,
+  hashtagSearchError: null,
+
   ImagePaths: [],
   myPost: [],
 };
@@ -36,6 +40,11 @@ export const UPLOAD_IMAGES_REQUEST = "UPLOAD_IMAGES_REQUEST";
 export const DELETE_POST_REQUEST = 'DELETE_POST_REQUEST'
 export const DELETE_POST_SUCCESS = 'DELETE_POST_SUCCESS'
 export const DELETE_POST_FAILURE = 'DELETE_POST_FAILURE'
+
+export const HASHTAG_SEARCH_REQUEST = 'HASHTAG_SEARCH_REQUEST'
+export const HASHTAG_SEARCH_SUCCESS = 'HASHTAG_SEARCH_SUCCESS'
+export const HASHTAG_SEARCH_FAILURE = 'HASHTAG_SEARCH_FAILURE'
+
 
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
@@ -89,22 +98,38 @@ const reducer = (state = initialState, action) => {
         break;
 
 
-      case DELETE_POST_REQUEST:
-        draft.deletePostLoading = true;
-        draft.deletePostDone = false;
-        draft.deletePostError = null;
-        break;
-      case DELETE_POST_SUCCESS:
-        draft.deletePostLoading = false;
-        draft.deletePostDone = true;
-        draft.myPost = draft.myPost.filter(v => v.id !== action.data.PostId);
-        break;
-      case DELETE_POST_FAILURE:
-        draft.deletePostLoading = false;
-        draft.deletePostDone = true;
-        draft.deletePostError = action.error;
-        break;
-  
+        case DELETE_POST_REQUEST:
+          draft.deletePostLoading = true;
+          draft.deletePostDone = false;
+          draft.deletePostError = null;
+          break;
+        case DELETE_POST_SUCCESS:
+          draft.deletePostLoading = false;
+          draft.deletePostDone = true;
+          draft.myPost = draft.myPost.filter(v => v.id !== action.data.PostId);
+          break;
+        case DELETE_POST_FAILURE:
+          draft.deletePostLoading = false;
+          draft.deletePostDone = true;
+          draft.deletePostError = action.error;
+          break;
+
+          case HASHTAG_SEARCH_REQUEST:
+            draft.hashtagSearchLoading = true;
+            draft.hashtagSearchDone = false;
+            draft.hashtagSearchError = null;
+            break;
+          case HASHTAG_SEARCH_SUCCESS:
+            draft.hashtagSearchLoading = false;
+            draft.hashtagSearchDone = true;
+            draft.myPost = action.data;
+            break;
+          case HASHTAG_SEARCH_FAILURE:
+            draft.hashtagSearchLoading = false;
+            draft.hashtagSearchDone = true;
+            draft.hashtagSearchError = action.error;
+            break;
+        
       
 
       default:

@@ -128,7 +128,7 @@ const page = () => {
                <div className="bode"/>
             </BorderDiv>
                 <DivEdit style={{display : 'flex', color : '#777', justifyContent : 'flex-end', margin : '10px 5vw 0px 0px'}}>
-                    <p onClick={() => Router.replace(`/write?PostId=${data.id}`)}>수정</p>
+                    <p onClick={() => Router.replace(`/write?PostId=${parseInt(data.id, 10)}`)}>수정</p>
                     <p>/</p>
                     <p onClick={deletePost(data.id)}>삭제</p>
                 </DivEdit>

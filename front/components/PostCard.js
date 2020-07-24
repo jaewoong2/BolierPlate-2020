@@ -3,13 +3,34 @@ import { LOAD_MYINFO_REQUEST } from '../reducer/user';
 import { LOAD_MYPOST_REQUEST, DELETE_POST_REQUEST } from '../reducer/post';
 import React, { useEffect, useCallback, useMemo } from 'react'
 import styled from 'styled-components';
-import { Avatar, Dropdown, Menu } from 'antd';
+import { Avatar, Dropdown, Menu, Typography } from 'antd';
 import Link from 'next/link';
 import moment from 'moment';
 import 'moment/locale/ko'
 import { EditTwoTone, WarningOutlined, SmallDashOutlined, LineOutlined } from '@ant-design/icons';
 import  Router from 'next/router';
 moment.locale('ko')
+
+const LineStyledDiv = styled.span`
+  margin : 3px;
+  width : 100%;
+  border : 1px solid #777;
+`
+const LineWrapperDiv = styled.span`
+   display : flex;
+    align-items : center;
+    margin-left : 4vw;
+    margin-top : 3px;
+    width : 90%;
+`
+const CircleDiv = styled.span`
+    border-radius : 50%;
+    padding : 5px;
+    border : 1px solid gray;
+    background-color: #1818d1c0; 
+    width : 14px;
+    height: 14px;
+`
 
 const CenterdDiv = styled.div`
   width: 100%;
@@ -42,12 +63,18 @@ const SubInfo = styled.div`
   color: #434343;
   float : right;
 
+  b {
+    font-size : 11.5px;
+  }
   /* span 사이에 가운뎃점 문자 보여 주기 */
   span + span:before {
     color: #434343;
     padding-left: 0.25rem;
     padding-right: 0.25rem;
     content: "\\B7"; /* 가운뎃점 문자 */
+  }
+  span {
+    font-size : 11.5px;
   }
   .edit {
    margin-right : '4px'
@@ -56,22 +83,22 @@ const SubInfo = styled.div`
 `;
 
 const Tags = styled.div`
-  margin-left : 1rem;
+  margin-left : 0.5rem;
   margin-top: 0.5rem;
   .tag {
+    font-size : 11px;
     display: inline-block;
-    color: blue;
     text-decoration: none;
-    margin-right: 0.5rem;
+    margin-right: 3px;
     &:hover {
-      color: #fad2df;
+      color: #4e91cf;
       cursor : pointer;
     }
   }
 `;
 const PostContent = styled.div`
   margin-left : 10px;
-  font-size: 1.1125rem;
+  font-size: 11px;
   color: #434343;
   overflow: auto;
   img {
@@ -112,35 +139,6 @@ const PostCard = () => {
   })
   },[loginInfo])
 
-  const lineStyleMemo = useMemo(() => {
-    return {
-      margin : '3px',
-      width : '100%', 
-      border : '1px solid #777'
-    }
-  },[]);
-
-  const lineWrapperMemo = useMemo(() => {
-    return {
-      display : 'flex', 
-      alignItems : 'center',
-      marginLeft : '4vw', 
-      marginTop : '3px', 
-      width : '90%'
-    }
-  },[]);
-
-  const circleMemo = useMemo(() => {
-    return {
-      borderRadius : '50%',
-      padding : '5px', 
-      border : '1px, solid, gray', 
-      backgroundColor:'#1818d1c0', 
-      width : '14px', 
-      height:'14px'
-    }
-  },[])
-
   const deletePost = useCallback((id) => () => {
     dispatch({
       type : DELETE_POST_REQUEST,
@@ -154,7 +152,7 @@ const PostCard = () => {
   return (
     <div>
       {myPost?.map((v, i) => (
-        <>
+        <div key={v + i + 'post' + Math.random() * 300}>
 <CenterdDiv>
         <PostViewerBlock>
           <PostHead>
@@ -164,7 +162,7 @@ const PostCard = () => {
             <SubInfo>
             <span>
               <AvartarStyle
-                size={32}
+                size={24}
                 src={`http://localhost:3055/${v.User?.Images[0]?.src}`}
               ></AvartarStyle>
               <b>{v.User?.nickname}</b>
@@ -185,25 +183,25 @@ const PostCard = () => {
                </span>
             </SubInfo>
             <Tags>
-              <div className="tag">#태그1</div>
-              <div className="tag">#태그2</div>
-              <div className="tag">#태그3</div>
+              {v?.Hashtags.map((tags, i) => (
+                 <Typography.Text key={tags + '_' + i} code className="tag">{tags.name}</Typography.Text>
+              ))}
             </Tags>
           </PostHead>
           <PostContent dangerouslySetInnerHTML={{ __html: v.content.length > 50 ? v.content.slice(0,50) +' ....' : v.content }} />
         </PostViewerBlock>
       </CenterdDiv>
         {i % 2 === 0 ?
-    (<div style={lineWrapperMemo}>
-    <div style={lineStyleMemo}></div>
-    <div style={circleMemo}></div>
-    </div>)
+    (<LineWrapperDiv>
+    <LineStyledDiv></LineStyledDiv>
+    <CircleDiv></CircleDiv>
+    </LineWrapperDiv>)
      :
-    (<div style={lineWrapperMemo}>
-    <div style={circleMemo} />
-    <div style={lineStyleMemo} />
-    </div>)}
-        </>
+    (<LineWrapperDiv>
+    <CircleDiv></CircleDiv>
+    <LineStyledDiv></LineStyledDiv>
+    </LineWrapperDiv>)}
+        </div>
       ))}
     </div>
   );

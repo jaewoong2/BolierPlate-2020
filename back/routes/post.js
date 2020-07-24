@@ -1,12 +1,13 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
-const { Post, Image, Comment, Introduce, User } = require('../models');
+const { Post, Image, Comment, Introduce, User, Hashtag } = require('../models');
 const router = express.Router()
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { removeHtmlAndShorten } = require('./sanitizeMiddle');
+const { Hash } = require('crypto');
 
 try {
     fs.accessSync('uploads');
@@ -22,8 +23,13 @@ const upload = multer({
         },
         filename(req, file, done) {
             const ext = path.extname(file.originalname); // 업로드할때 언제 업로드 한지 파일명에 붙혀주기 위해서 확장자만 추출
+            console.log(file)
             const basename = path.basename(file.originalname, ext); // 노드에서 path 모듈 제공, 파일명에 확장자를 붙혀 추출해준다
-            done(null, basename + '_' + new Date().getTime() + ext) // 파일명12312312.png
+            if(ext) {
+                done(null, basename + '_' + new Date().getTime() + ext) // 파일명12312312.png
+            } else {
+                done(null, basename + '.png');
+            }
         },
     }),
     limits: { fileSize: 20 * 1024 * 1024 }, // 20mb
@@ -50,11 +56,23 @@ router.post('/', removeHtmlAndShorten ,async (req, res, next) => {
                const images = await Promise.all(req.body.image.map((image) => {
                     return Image.create({ src : image });
                 }))
+                console.log(images)
                 await post.addImages(images);
             } else { //이미지를 하나만 올리면 image : asd.png
                 const image = await Image.create({ src : req.body.image });
                 await post.addImages(image)
             }
+        }
+
+        if(req.body.hashtag) {
+                const hashtags = await Promise.all(req.body.hashtag.map((hashtag) => {
+                    console.log(hashtag)
+                    return Hashtag.findOrCreate({ 
+                        where : { name : hashtag.toLowerCase() }
+                    })
+                }))
+                console.log(hashtags)
+                await post.addHashtags(...hashtags)
         }
         const fullPost = await Post.findOne({
             where : {id : post.id},
@@ -69,6 +87,8 @@ router.post('/', removeHtmlAndShorten ,async (req, res, next) => {
             }, {
                 model : User,
                 attributes : ['id', 'nickname']
+            }, {
+                model : Hashtag,
             }]
         })
         res.status(201).json(fullPost)
@@ -158,6 +178,8 @@ router.get('/', removeHtmlAndShorten, async (req, res, next) => {
                     model : Image,
                     attributes : ['src']
                 }]
+            }, {
+                model : Hashtag  
             }]
         })
         res.status(201).json(fullPost)
@@ -187,6 +209,8 @@ router.get('/:postId',  async (req, res, next) => {
                     model : Image,
                     attributes : ['src']
                 }]
+            }, {
+                model : Hashtag
             }]
         })
         res.status(201).json(fullPost)
@@ -219,6 +243,49 @@ router.delete('/:PostId', async(req, res, next) => {
         });
         res.status(201).json({ PostId : parseInt(req.params.PostId, 10)});
     } catch (err) {
+        console.error(err)
+        next(err)
+    }
+})
+
+router.get('/hashtag/:tagname', async (req, res, next) => {
+    try {
+        console.log('ㅁㄴㅇㅁㄴㅇㅁㄴ', req.params.tagname, '흐흐흐흐')
+        const tagName = decodeURIComponent(req.params.tagname);
+        if(!tagName) {
+            return res.status(403).send('잘못된 해쉬태그')
+        }
+        const hashtagPosts = await Post.findAll({
+            include : [{
+                model : Hashtag,
+                where : { name : tagName }
+            }]
+        });
+        const hashtagWithPosts = await Post.findAll({
+            where : { id : hashtagPosts.map(v => v.id) },
+            order : [['createdAt', 'DESC']],
+            include : [{
+                model : Image,
+            }, {
+                model : Comment,
+                Include : [{
+                    model : User,
+                    attributes : ['id', 'nickname']
+                }]
+            }, {
+                model : User,
+                attributes : ['id', 'nickname'],
+                include : [{
+                    model : Image,
+                    attributes : ['src']
+                }]
+            }, {
+                model : Hashtag
+            }]
+        });
+
+        res.status(201).json(hashtagWithPosts)
+    } catch(err) {
         console.error(err)
         next(err)
     }
