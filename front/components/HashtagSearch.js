@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import useSWR from 'swr'
 import axios from 'axios';
@@ -16,11 +16,12 @@ const CenterdDiv = styled.div`
     display : flex;
     justify-content : center;
 `
+
 const HashText = styled(Typography.Text)`
-    margin-right : 3px;
-    font-size : 12px;
+    margin-right : 5px;
     color : #0f2438;
     word-break: keep-all;
+    cursor : pointer;
 `
 
 const fetcher = (url) => axios.get(url, { withCredentials: true })
@@ -28,7 +29,8 @@ const fetcher = (url) => axios.get(url, { withCredentials: true })
 
 const HashtagSearch = () => {
     const { data, error } = useSWR(`http://localhost:3055/hashtag`, fetcher);
-    const { myPost } = useSelector((state) => state.post)
+    const { myPost, tagName } = useSelector((state) => state.post)
+    const [strongText, setStrongText] = useState('')
     const dispatch = useDispatch();
 
     const searchHashtag = useCallback((tag) => () => {
@@ -38,14 +40,18 @@ const HashtagSearch = () => {
                 name : encodeURIComponent(tag)
             }
         })
-    })
+    },[tagName])
+    
+    useEffect(() =>{
+        setStrongText(tagName)
+    },[tagName])
 
     return (
         <CenterdDiv>
         <CenterDiv>
-            {data?.map(v => {
-                 return <HashText onClick={searchHashtag(v?.name)} keyboard>{v?.name}</HashText>
-                })}
+        {data?.map(v => {
+     return (<HashText type="secondary" style={{fontSize : v?.Posts?.length * 1.25 + 10.5, color : strongText === v?.name && 'black'}} onClick={searchHashtag(v?.name)}>{v?.name}</HashText>)
+            })}
         </CenterDiv>
         </CenterdDiv>
     )

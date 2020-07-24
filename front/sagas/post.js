@@ -122,7 +122,8 @@ function* hashtagSearch(action) {
          const result = yield call(hashtagSearchAPI, action.data.name)
         yield put({
             type : HASHTAG_SEARCH_SUCCESS,
-            data : result.data
+            data : result.data,
+            tagName : decodeURIComponent(action.data.name)
         })
         
     } catch(err) {

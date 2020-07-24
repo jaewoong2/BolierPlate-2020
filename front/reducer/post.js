@@ -21,9 +21,13 @@ const initialState = {
   hashtagSearchDone : false,
   hashtagSearchError: null,
 
+  toggleTag : false,
+  tagName : '',
   ImagePaths: [],
   myPost: [],
 };
+
+export const TOGGLE_TAG = 'TOGGLE_TAG';
 
 export const WRTIE_REQUEST = "WRTIE_REQUEST";
 export const WRTIE_SUCCESS = "WRTIE_SUCCESS";
@@ -123,14 +127,19 @@ const reducer = (state = initialState, action) => {
             draft.hashtagSearchLoading = false;
             draft.hashtagSearchDone = true;
             draft.myPost = action.data;
+            draft.tagName = action.tagName;
+            draft.toggleTag = true;
             break;
+            
           case HASHTAG_SEARCH_FAILURE:
             draft.hashtagSearchLoading = false;
             draft.hashtagSearchDone = true;
             draft.hashtagSearchError = action.error;
             break;
-        
-      
+
+          case TOGGLE_TAG :
+            draft.toggleTag = !draft.toggleTag;
+            break;
 
       default:
         break;

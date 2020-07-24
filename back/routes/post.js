@@ -71,9 +71,10 @@ router.post('/', removeHtmlAndShorten ,async (req, res, next) => {
                         where : { name : hashtag.toLowerCase() }
                     })
                 }))
-                console.log(hashtags)
-                await post.addHashtags(...hashtags)
+                console.log(...hashtags)
+                await post.addHashtags(hashtags.map(v => v[0]))
         }
+
         const fullPost = await Post.findOne({
             where : {id : post.id},
             include : [{

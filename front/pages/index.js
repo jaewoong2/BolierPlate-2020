@@ -2,12 +2,16 @@ import React, { useEffect, useState } from 'react'
 import MyLayout from '../components/MyLayout'
 import PostCard from '../components/PostCard'
 import HashtagSearch from '../components/HashtagSearch'
+import { useSelector } from 'react-redux'
 
 const Home = () => {
+  const { toggleTag } =  useSelector(state => state.post);
+
+
   return (
     <MyLayout>
-      <HashtagSearch/>
-    <PostCard/>  
+      {toggleTag && <HashtagSearch/>}
+      <PostCard/>  
     </MyLayout>
   )
 }

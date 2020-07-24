@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { LOAD_MYINFO_REQUEST } from '../reducer/user';
-import { LOAD_MYPOST_REQUEST, DELETE_POST_REQUEST } from '../reducer/post';
+import { LOAD_MYPOST_REQUEST, DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST } from '../reducer/post';
 import React, { useEffect, useCallback, useMemo } from 'react'
 import styled from 'styled-components';
 import { Avatar, Dropdown, Menu, Typography } from 'antd';
@@ -149,6 +149,16 @@ const PostCard = () => {
   },[])
 
 
+  
+  const searchHashtag = useCallback((tag) => () => {
+    dispatch({
+        type : HASHTAG_SEARCH_REQUEST,
+        data : {
+            name : encodeURIComponent(tag)
+        }
+    })
+},[])
+
   return (
     <div>
       {myPost?.map((v, i) => (
@@ -184,7 +194,7 @@ const PostCard = () => {
             </SubInfo>
             <Tags>
               {v?.Hashtags.map((tags, i) => (
-                 <Typography.Text key={tags + '_' + i} code className="tag">{tags.name}</Typography.Text>
+                 <Typography.Text onClick={searchHashtag(tags.name)} key={tags + '_' + i} code className="tag">{tags.name}</Typography.Text>
               ))}
             </Tags>
           </PostHead>

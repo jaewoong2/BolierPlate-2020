@@ -1,13 +1,15 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { Row, Col, Dropdown } from 'antd'
 import styled from 'styled-components';
 import NavBar from './NavBar';
 import Editor from './Edit/Editor';
 import PostView from './PostView';
 import PostCard from './PostCard';
-import { EditOutlined, HeartFilled, StarOutlined, StarFilled } from '@ant-design/icons';
+import { EditOutlined, HeartFilled, StarOutlined, StarFilled, TagsOutlined } from '@ant-design/icons';
 import Text from 'antd/lib/typography/Text';
 import Router, { useRouter } from 'next/router';
+import { TOGGLE_TAG } from '../reducer/post';
+import { useDispatch } from 'react-redux';
 
 const EditBtn = styled(StarFilled)`
 /* border-radius : 50%;
@@ -21,6 +23,20 @@ const EditBtn = styled(StarFilled)`
   filter : drop-shadow( 3px 3px 10px #777);
   color : #a4ce61c0;
 `
+
+const TagBtn = styled(TagsOutlined)`
+/* border-radius : 50%;
+  width : 40px;
+  height: 40px; */
+  font-size : 40px;
+  position : fixed;
+  left : 16vw;
+  bottom : 13vh;
+  /* box-shadow : 3px 3px 10px #777; */
+  filter : drop-shadow( 3px 3px 10px #777);
+  color : #2085a1c7;
+`
+
 
 const ColStyled = styled(Col)`
     height : 80vh;
@@ -39,7 +55,7 @@ align-items : center;
 `
 const MyLayout = ({ children }) => {
     const [resposinveSmall, setResposinveSmall] = useState(false);
-
+    const dispatch = useDispatch();
     const router = useRouter();
     const queryname = router.pathname.slice(1);
 
@@ -65,6 +81,17 @@ const MyLayout = ({ children }) => {
         right : '3rem',
       } 
     })
+    const LeftBtn = useMemo(() => {
+      return {
+        left : '2rem'
+      }
+    })
+    
+    const clickTag = useCallback(() => {
+      dispatch({
+        type : TOGGLE_TAG
+      })
+    },[])
 
     return (
       <>
@@ -72,6 +99,7 @@ const MyLayout = ({ children }) => {
       <Col  xs={24} md={3}  span={4}>
       </Col>
       <ColStyled xs={24} md={18} span={4}>
+        {(!resposinveSmall ? <TagBtn onClick={clickTag}/> : <TagBtn onClick={clickTag} style={LeftBtn}/>)}
             <NavBar />
             {children}
       </ColStyled>
