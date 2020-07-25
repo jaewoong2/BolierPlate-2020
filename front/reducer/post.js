@@ -5,9 +5,9 @@ const initialState = {
   wrtieDone: false,
   wrtieError: null,
 
-  loadMyPostLoading: false,
-  loadMyPostDone: false,
-  loadMyPostError: null,
+  loadPostsLoading: false,
+  loadPostsDone: false,
+  loadPostsError: null,
 
   uploadImagesLoading: false,
   uploadImagesDone: false,
@@ -21,10 +21,11 @@ const initialState = {
   hashtagSearchDone : false,
   hashtagSearchError: null,
 
+  InfinityScroll : true,
   toggleTag : false,
   tagName : '',
   ImagePaths: [],
-  myPost: [],
+  PostsData: [],
 };
 
 export const TOGGLE_TAG = 'TOGGLE_TAG';
@@ -33,9 +34,9 @@ export const WRTIE_REQUEST = "WRTIE_REQUEST";
 export const WRTIE_SUCCESS = "WRTIE_SUCCESS";
 export const WRTIE_FAILURE = "WRTIE_FAILURE";
 
-export const LOAD_MYPOST_REQUEST = "LOAD_MYPOST_REQUEST";
-export const LOAD_MYPOST_SUCCESS = "LOAD_MYPOST_SUCCESS";
-export const LOAD_MYPOST_FAILURE = "LOAD_MYPOST_FAILURE";
+export const LOAD_POSTS_REQUEST = "LOAD_POSTS_REQUEST";
+export const LOAD_POSTS_SUCCESS = "LOAD_POSTS_SUCCESS";
+export const LOAD_POSTS_FAILURE = "LOAD_POSTS_FAILURE";
 
 export const UPLOAD_IMAGES_SUCCESS = "UPLOAD_IMAGES_SUCCESS";
 export const UPLOAD_IMAGES_FAILURE = "UPLOAD_IMAGES_FAILURE";
@@ -61,6 +62,7 @@ const reducer = (state = initialState, action) => {
       case WRTIE_SUCCESS:
         draft.wrtieLoading = false;
         draft.wrtieDone = true;
+        draft.PostsData.unshift(action.data)
         break;
       case WRTIE_FAILURE:
         draft.wrtieLoading = false;
@@ -68,21 +70,23 @@ const reducer = (state = initialState, action) => {
         draft.wrtieError = action.error;
         break;
 
-      case LOAD_MYPOST_REQUEST:
-        draft.loadMyPostLoading = true;
-        draft.loadMyPostDone = false;
-        draft.loadMyPostError = null;
+      case LOAD_POSTS_REQUEST:
+        draft.loadPostsLoading = true;
+        draft.loadPostsDone = false;
+        draft.loadPostsError = null;
         break;
-      case LOAD_MYPOST_SUCCESS:
-        draft.loadMyPostLoading = false;
-        draft.loadMyPostDone = true;
-        draft.myPost = action.data;
+      case LOAD_POSTS_SUCCESS:
+        draft.loadPostsLoading = false;
+        draft.loadPostsDone = true;
+        draft.PostsData = draft.PostsData ? (draft.tagName ? action.data : draft.PostsData.concat(action.data)) : action.data;
+        draft.InfinityScroll = action.data.length === 5 ? true : false;
+        draft.tagName = '';
         break;
-      case LOAD_MYPOST_FAILURE:
-        draft.loadMyPostLoading = false;
-        draft.loadMyPostDone = true;
-        draft.myPost = [];
-        draft.loadMyPostError = action.error;
+      case LOAD_POSTS_FAILURE:
+        draft.loadPostsLoading = false;
+        draft.loadPostsDone = true;
+        draft.PostsData = [];
+        draft.loadPostsError = action.error;
         break;
 
       case UPLOAD_IMAGES_REQUEST:
@@ -110,7 +114,7 @@ const reducer = (state = initialState, action) => {
         case DELETE_POST_SUCCESS:
           draft.deletePostLoading = false;
           draft.deletePostDone = true;
-          draft.myPost = draft.myPost.filter(v => v.id !== action.data.PostId);
+          draft.PostsData = draft.PostsData.filter(v => v.id !== action.data.PostId);
           break;
         case DELETE_POST_FAILURE:
           draft.deletePostLoading = false;
@@ -126,7 +130,8 @@ const reducer = (state = initialState, action) => {
           case HASHTAG_SEARCH_SUCCESS:
             draft.hashtagSearchLoading = false;
             draft.hashtagSearchDone = true;
-            draft.myPost = action.data;
+            draft.PostsData = (draft.tagName && (draft.tagName === action.tagName)) ? draft.PostsData.concat(action.data) : action.data;
+            draft.InfinityScroll = action?.data?.length === 5 ? true : false;
             draft.tagName = action.tagName;
             draft.toggleTag = true;
             break;

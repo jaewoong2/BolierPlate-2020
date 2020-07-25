@@ -3,7 +3,7 @@ const { Post, Image, Comment, Introduce, User, Hashtag } = require('../models');
 const router = express.Router()
 
 
-router.get('/', async (req, res, next) => {
+router.get('/', async (req, res, next) => { // 해쉬태그 이름 가져오기
     try {
         const hashtags = await Hashtag.findAll({
             include : [{

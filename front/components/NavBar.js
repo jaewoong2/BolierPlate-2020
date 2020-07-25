@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { LOG_OUT_REQUEST } from "../reducer/user";
 import styled from "styled-components";
 import UseInput from "../Hooks/UseInput";
-import { HASHTAG_SEARCH_REQUEST } from "../reducer/post";
+import { HASHTAG_SEARCH_REQUEST, LOAD_POSTS_REQUEST } from "../reducer/post";
 
 const DivWrapper = styled.div`
   position : sticky;
@@ -66,7 +66,10 @@ const NavBar = () => {
     setVisible(prev => !prev);
   },[])
 
-  const onBackClick = useCallback(() => {
+  const onBackClick = useCallback((e) => {
+    e.key && 'logo' && dispatch({
+      type : LOAD_POSTS_REQUEST
+    })
     // Router.back()
     // router.pathname === '/' && 
     Router.replace('/')
@@ -122,6 +125,16 @@ const FullDIv = useMemo(() => {
   }
 },[])
 
+const onClickWriteBtn = useCallback(() => {
+  if(!loginInfo?.id) {
+    return () => {
+      setSetting('Login')
+      setVisible(prev => !prev);
+    }
+  }
+  Router.replace('/write')
+},[loginInfo])
+
  return (
 <DivWrapper>
     <Menu
@@ -136,7 +149,7 @@ const FullDIv = useMemo(() => {
           Logo
       </Menu.Item>
       <StyledMenuForInputSearch style={{borderBottomWidth: '0px'}}>
-          <Popover placement="right" title={null} content={<StyledInputSearch onPressEnter={searchHashtag} onSearch={searchHashtag} onChange={onChangeTag} value={tag}/>} trigger="click">
+          <Popover placement="right" title={null} content={<StyledInputSearch loading={hashtagSearchLoading} onPressEnter={searchHashtag} onSearch={searchHashtag} onChange={onChangeTag} value={tag}/>} trigger="click">
             <div style={FullDIv}>
             <SearchOutlined />
             </div>

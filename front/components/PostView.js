@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { LOAD_MYINFO_REQUEST } from '../reducer/user';
-import { LOAD_MYPOST_REQUEST } from '../reducer/post';
+import { LOAD_MYPOST_REQUEST, LOAD_POSTS_REQUEST } from '../reducer/post';
 import React, { useEffect } from 'react'
 import styled from 'styled-components';
 import { Avatar } from 'antd';
@@ -69,15 +69,14 @@ const PostContent = styled.div`
 
 const PostView = () => {
     const dispatch = useDispatch();
-    const { myPost } = useSelector(state => state.post)
-    const { loginInfo } = useSelector((state) => state.user)
+    const { PostsData } = useSelector(state => state.post)
 
     useEffect(() => {
         dispatch({
             type : LOAD_MYINFO_REQUEST
         })
         dispatch({
-            type : LOAD_MYPOST_REQUEST
+            type : LOAD_POSTS_REQUEST
         })
     },[])
 
@@ -85,7 +84,7 @@ const PostView = () => {
 
     return (
         <div>
-            {myPost?.map(v => {
+            {PostsData?.map(v => {
                 return (
                     <CenterdDiv>
                     <PostViewerBlock>

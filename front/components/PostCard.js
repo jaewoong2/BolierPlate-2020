@@ -1,20 +1,20 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { LOAD_MYINFO_REQUEST } from '../reducer/user';
-import { LOAD_MYPOST_REQUEST, DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST } from '../reducer/post';
-import React, { useEffect, useCallback, useMemo } from 'react'
+import { DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST, LOAD_POSTS_REQUEST } from '../reducer/post';
+import React, { useEffect, useCallback } from 'react'
 import styled from 'styled-components';
 import { Avatar, Dropdown, Menu, Typography } from 'antd';
 import Link from 'next/link';
 import moment from 'moment';
 import 'moment/locale/ko'
-import { EditTwoTone, WarningOutlined, SmallDashOutlined, LineOutlined } from '@ant-design/icons';
+import { SmallDashOutlined } from '@ant-design/icons';
 import  Router from 'next/router';
 moment.locale('ko')
 
 const LineStyledDiv = styled.span`
   margin : 3px;
   width : 100%;
-  border : 1px solid #777;
+  border-bottom : 0.5px solid #777;
 `
 const LineWrapperDiv = styled.span`
    display : flex;
@@ -28,8 +28,8 @@ const CircleDiv = styled.span`
     padding : 5px;
     border : 1px solid gray;
     background-color: #1818d1c0; 
-    width : 14px;
-    height: 14px;
+    width : 3px;
+    height: 3px;
 `
 
 const CenterdDiv = styled.div`
@@ -119,25 +119,10 @@ margin-left: 5px;
  overflow : hidden ;
 `
 
-const PostCard = () => {
+const PostCard = ({ postData : v, idx : i }) => {
   const dispatch = useDispatch();
-  const { myPost } = useSelector(state => state.post)
+  const { PostsData } = useSelector(state => state.post)
   const { loginInfo } = useSelector((state) => state.user)
-
-  useEffect(() => {
-      dispatch({
-          type : LOAD_MYINFO_REQUEST
-      })
-      dispatch({
-        type : LOAD_MYPOST_REQUEST
-    })
-  },[])
-
-  useEffect(() => {
-    dispatch({
-      type : LOAD_MYPOST_REQUEST
-  })
-  },[loginInfo])
 
   const deletePost = useCallback((id) => () => {
     dispatch({
@@ -148,8 +133,6 @@ const PostCard = () => {
     })
   },[])
 
-
-  
   const searchHashtag = useCallback((tag) => () => {
     dispatch({
         type : HASHTAG_SEARCH_REQUEST,
@@ -161,7 +144,7 @@ const PostCard = () => {
 
   return (
     <div>
-      {myPost?.map((v, i) => (
+      {/* {postData?.map((v, i) => ( */}
         <div key={v + i + 'post' + Math.random() * 300}>
 <CenterdDiv>
         <PostViewerBlock>
@@ -171,10 +154,11 @@ const PostCard = () => {
               </DivWrapper>
             <SubInfo>
             <span>
+              {v.User?.Images && 
               <AvartarStyle
                 size={24}
                 src={`http://localhost:3055/${v.User?.Images[0]?.src}`}
-              ></AvartarStyle>
+              ></AvartarStyle>}
               <b>{v.User?.nickname}</b>
             </span>
               <span>{moment(v.createdAt).format('YYYY.MM.DD')}</span>
@@ -193,8 +177,8 @@ const PostCard = () => {
                </span>
             </SubInfo>
             <Tags>
-              {v?.Hashtags.map((tags, i) => (
-                 <Typography.Text onClick={searchHashtag(tags.name)} key={tags + '_' + i} code className="tag">{tags.name}</Typography.Text>
+              {v?.Hashtags?.map((tags, index) => (
+                 <Typography.Text onClick={searchHashtag(tags.name)} key={tags + '_' + index} code className="tag">{tags.name}</Typography.Text>
               ))}
             </Tags>
           </PostHead>
@@ -212,7 +196,7 @@ const PostCard = () => {
     <LineStyledDiv></LineStyledDiv>
     </LineWrapperDiv>)}
         </div>
-      ))}
+      {/* ))} */}
     </div>
   );
 };

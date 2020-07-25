@@ -9,7 +9,8 @@ import { EditOutlined, HeartFilled, StarOutlined, StarFilled, TagsOutlined } fro
 import Text from 'antd/lib/typography/Text';
 import Router, { useRouter } from 'next/router';
 import { TOGGLE_TAG } from '../reducer/post';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import ModalForm from './ModalForm';
 
 const EditBtn = styled(StarFilled)`
 /* border-radius : 50%;
@@ -53,10 +54,14 @@ display : flex;
 justify-content : center;
 align-items : center;
 `
-const MyLayout = ({ children }) => {
+const MyLayout = ({ children, onScrollHandler }) => {
     const [resposinveSmall, setResposinveSmall] = useState(false);
+    const [visible, setVisible] = useState(false);
+    const [setting, setSetting] = useState('');
+
     const dispatch = useDispatch();
     const router = useRouter();
+    const { loginInfo } = useSelector((state) => state.user);
     const queryname = router.pathname.slice(1);
 
     useEffect(() => {
@@ -93,21 +98,33 @@ const MyLayout = ({ children }) => {
       })
     },[])
 
+    
+const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
+  if(!loginInfo?.id) {
+      setSetting('Login')
+        setVisible(prev => !prev);
+  } else {
+    Router.replace('/write')
+  }
+},[loginInfo])
+
+
     return (
       <>
     <RowStyled justify="space-between" align="middle">
       <Col  xs={24} md={3}  span={4}>
       </Col>
-      <ColStyled xs={24} md={18} span={4}>
-        {(!resposinveSmall ? <TagBtn onClick={clickTag}/> : <TagBtn onClick={clickTag} style={LeftBtn}/>)}
+      <ColStyled onScroll={onScrollHandler} xs={24} md={18} span={4}>
+        {!queryname && (!resposinveSmall ? <TagBtn onClick={clickTag}/> : <TagBtn onClick={clickTag} style={LeftBtn}/>)}
             <NavBar />
             {children}
+    {visible && <ModalForm setting={setting} setVisible={setVisible} visible={visible}/>}
       </ColStyled>
       <Col xs={24} md={3}  span={4}>
       </Col>
     </RowStyled>
     <Dropdown placement="topLeft" overlay={<Text code>Write</Text>}>
-    {queryname !== 'write' ? (!resposinveSmall ? <EditBtn onClick={() => Router.replace('/write')}/> : <EditBtn onClick={() => Router.replace('/write')} style={responsiveSmallBtn}/>) : <div></div>}
+    {queryname !== 'write' ? (!resposinveSmall ? <EditBtn onClick={onClickWriteBtn}/> : <EditBtn onClick={onClickWriteBtn} style={responsiveSmallBtn}/>) : <div></div>}
     </Dropdown>
       </>
     )

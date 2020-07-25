@@ -8,6 +8,7 @@ const path = require('path');
 const fs = require('fs');
 const { removeHtmlAndShorten } = require('./sanitizeMiddle');
 const { Hash } = require('crypto');
+const { Op } = require('sequelize');
 
 try {
     fs.accessSync('uploads');
@@ -133,6 +134,18 @@ router.patch('/', removeHtmlAndShorten ,async (req, res, next) => {
                 await post.addImages(image)
             }
         }
+        if(req.body.hashtag) {
+            await post.removeHashtags()
+            const hashtags = await Promise.all(req.body.hashtag.map((hashtag) => {
+                console.log(hashtag)
+                return Hashtag.findOrCreate({ 
+                    where : { name : hashtag.toLowerCase() }
+                })
+            }))
+            console.log(...hashtags)
+            await post.addHashtags(hashtags.map(v => v[0]))
+    }
+
         const fullPost = await Post.findOne({
             where : {id :  req.body.id  },
             include : [{
@@ -146,6 +159,8 @@ router.patch('/', removeHtmlAndShorten ,async (req, res, next) => {
             }, {
                 model : User,
                 attributes : ['id', 'nickname']
+            }, {
+                model : Hashtag,
             }]
         })
         res.status(201).json(fullPost)
@@ -251,12 +266,20 @@ router.delete('/:PostId', async(req, res, next) => {
 
 router.get('/hashtag/:tagname', async (req, res, next) => {
     try {
-        console.log('ㅁㄴㅇㅁㄴㅇㅁㄴ', req.params.tagname, '흐흐흐흐')
+        const lastId = parseInt(req.query.lastId);
+        const where = {};
+        if(lastId) {
+            where.id = { [Op.lt] : lastId }
+            // where : {id :{ [Op.lt ] : lastId } }
+        }
         const tagName = decodeURIComponent(req.params.tagname);
         if(!tagName) {
             return res.status(403).send('잘못된 해쉬태그')
         }
         const hashtagPosts = await Post.findAll({
+            where ,
+            limit : 5 ,
+            order : [[ 'createdAt', "DESC"]],
             include : [{
                 model : Hashtag,
                 where : { name : tagName }

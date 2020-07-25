@@ -157,6 +157,7 @@ const Editor = ({ data }) => {
         if(data) {
           setTitle(data.title)
           setContent(data.content)
+          setHashtagArr(data.Hashtags?.map(v => v.name)) 
           quillInstance.current.root.innerHTML = data.content
         }
       }

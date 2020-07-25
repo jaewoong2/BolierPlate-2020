@@ -1,6 +1,6 @@
 import { takeLatest, call, fork, all, put, throttle } from "redux-saga/effects"
 import axios from 'axios';
-import { WRTIE_SUCCESS, WRTIE_FAILURE, WRTIE_REQUEST, LOAD_MYPOST_REQUEST, LOAD_MYPOST_SUCCESS, LOAD_MYPOST_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_SUCCESS, DELETE_POST_REQUEST, DELETE_POST_SUCCESS, DELETE_POST_FAILURE, HASHTAG_SEARCH_REQUEST, HASHTAG_SEARCH_SUCCESS, HASHTAG_SEARCH_FAILURE } from "../reducer/post";
+import { WRTIE_SUCCESS, WRTIE_FAILURE, WRTIE_REQUEST, LOAD_MYPOST_REQUEST, LOAD_MYPOST_SUCCESS, LOAD_MYPOST_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_SUCCESS, DELETE_POST_REQUEST, DELETE_POST_SUCCESS, DELETE_POST_FAILURE, HASHTAG_SEARCH_REQUEST, HASHTAG_SEARCH_SUCCESS, HASHTAG_SEARCH_FAILURE, LOAD_POSTS_REQUEST, LOAD_POSTS_SUCCESS, LOAD_POSTS_FAILURE } from "../reducer/post";
 
 
 // 글쓰기
@@ -33,30 +33,30 @@ function* watchWrite() {
     yield throttle(2000, WRTIE_REQUEST, write);
 }
 
-// 로드마이포스트
-function loadMyPostAPI() {
-    return axios.get('/post')
+// 로드 포스츠
+function loadPostsAPI(lastId) {
+    return axios.get(`/posts?lastId=${lastId}`)
 }
 
-function* loadMyPost() {
+function* loadPosts(action) {
     try {  
-         const result = yield call(loadMyPostAPI)
+         const result = yield call(loadPostsAPI, action.lastId)
         yield put({
-            type : LOAD_MYPOST_SUCCESS,
+            type : LOAD_POSTS_SUCCESS,
             data : result.data
         })
         
     } catch(err) {
         console.error(err)
         yield put({
-            type : LOAD_MYPOST_FAILURE,
+            type : LOAD_POSTS_FAILURE,
             error : err.response.data
         })
     }
 }
 
-function* watchLoadMyPost() {
-    yield takeLatest(LOAD_MYPOST_REQUEST, loadMyPost);
+function* watchLoadPosts() {
+    yield takeLatest(LOAD_POSTS_REQUEST, loadPosts);
 }
 
 
@@ -113,13 +113,13 @@ function* watchDeletePost() {
 }
 
 
-function hashtagSearchAPI(data) {
-    return axios.get(`/post/hashtag/${data}`)
+function hashtagSearchAPI(data, lastId) {
+    return axios.get(`/post/hashtag/${data}?lastId=${lastId}`)
 }
 
 function* hashtagSearch(action) {
     try {  
-         const result = yield call(hashtagSearchAPI, action.data.name)
+         const result = yield call(hashtagSearchAPI, action.data.name, action.lastId)
         yield put({
             type : HASHTAG_SEARCH_SUCCESS,
             data : result.data,
@@ -147,7 +147,7 @@ function* watchHashtagSearch() {
 export default function* postSaga() {
     yield all([
         fork(watchWrite),
-        fork(watchLoadMyPost),
+        fork(watchLoadPosts),
         fork(watchPostImage),
         fork (watchDeletePost),
         fork(watchHashtagSearch)
