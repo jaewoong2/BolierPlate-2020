@@ -26,18 +26,38 @@ const Home = () => {
           })
         }
       }
+
+     
+      
   },[InfinityScroll, PostsData, loadPostsLoading, hashtagSearchLoading, tagName])
 
     
 
-  useEffect(() => {
-    dispatch({
-      type : LOAD_POSTS_REQUEST,
-    })          
+  useEffect(() => {          
     dispatch({
       type : LOAD_MYINFO_REQUEST,
     })
   },[])
+
+  useEffect(() => {
+    !tagName && dispatch({
+      type : LOAD_POSTS_REQUEST,
+    })
+  },[tagName])
+
+  useEffect(() => {
+    if(PostsData?.length === 5) {
+      if(!tagName && InfinityScroll && !loadPostsLoading) {
+        dispatch({
+          type : LOAD_POSTS_REQUEST,
+          lastId : PostsData[PostsData.length - 1]?.id
+        })
+      }
+    }
+  },[PostsData,
+    tagName,
+    InfinityScroll,
+    loadPostsLoading])
 
   return (
     <MyLayout onScrollHandler={scrollHandler}>

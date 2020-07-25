@@ -44,9 +44,10 @@ const NavBar = () => {
     const [searchVisible, setSearchVisible] = useState('');
     
     const { loginInfo } = useSelector((state) => state.user)
-    const { hashtagSearchLoading, hashtagSearchDone } = useSelector((state) => state.post)
+    const { tagName , loadPostsLoading, loadPostsDone ,hashtagSearchLoading, hashtagSearchDone } = useSelector((state) => state.post)
     const dispatch = useDispatch()
     const router = useRouter()
+    const queryname = router.pathname.slice(1);
 
     const onClickVisble = useCallback(() => {
       setSearchVisible(prev => !prev)
@@ -66,17 +67,14 @@ const NavBar = () => {
     setVisible(prev => !prev);
   },[])
 
-  const onBackClick = useCallback((e) => {
-    e.key && 'logo' && dispatch({
-      type : LOAD_POSTS_REQUEST
-    })
-    // Router.back()
-    // router.pathname === '/' && 
-    Router.replace('/')
-  },[])
+  const onBackClick = useCallback(() => {
+    !queryname && Router.reload();
+    queryname && Router.replace('/')
+  },[loadPostsLoading, loadPostsDone, queryname, tagName])
   
-  // 
-  // 
+  
+
+
   const onLogOut = useCallback(() => {
     dispatch({
       type : LOG_OUT_REQUEST
@@ -89,13 +87,14 @@ const NavBar = () => {
 
   
   const searchHashtag = useCallback(() => {
-    dispatch({
+    tagName !== tag && dispatch({
         type : HASHTAG_SEARCH_REQUEST,
         data : {
             name : encodeURIComponent(tag)
         }
     })
-},[tag])
+    queryname && Router.replace('/')
+},[tag, queryname, tagName])
 
 const LogoStyleMemo = useMemo(() => {
   return {
@@ -125,15 +124,8 @@ const FullDIv = useMemo(() => {
   }
 },[])
 
-const onClickWriteBtn = useCallback(() => {
-  if(!loginInfo?.id) {
-    return () => {
-      setSetting('Login')
-      setVisible(prev => !prev);
-    }
-  }
-  Router.replace('/write')
-},[loginInfo])
+
+
 
  return (
 <DivWrapper>
@@ -149,7 +141,7 @@ const onClickWriteBtn = useCallback(() => {
           Logo
       </Menu.Item>
       <StyledMenuForInputSearch style={{borderBottomWidth: '0px'}}>
-          <Popover placement="right" title={null} content={<StyledInputSearch loading={hashtagSearchLoading} onPressEnter={searchHashtag} onSearch={searchHashtag} onChange={onChangeTag} value={tag}/>} trigger="click">
+          <Popover placement="right" title={null} content={<StyledInputSearch placeholder="찾고 싶은 태그가 있나요?" loading={hashtagSearchLoading} onPressEnter={searchHashtag} onSearch={searchHashtag} onChange={onChangeTag} value={tag}/>} trigger="click">
             <div style={FullDIv}>
             <SearchOutlined />
             </div>

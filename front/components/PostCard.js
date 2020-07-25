@@ -40,7 +40,8 @@ const CenterdDiv = styled.div`
 `;
 
 const PostViewerBlock = styled.div`
-  margin-top: 2rem;
+  margin-top: 1rem;
+  margin-bottom : 1rem;
   width: 90%;
   &:hover {
     transition: all 0.1s ease-in;
@@ -144,7 +145,6 @@ const PostCard = ({ postData : v, idx : i }) => {
 
   return (
     <div>
-      {/* {postData?.map((v, i) => ( */}
         <div key={v + i + 'post' + Math.random() * 300}>
 <CenterdDiv>
         <PostViewerBlock>
@@ -185,7 +185,7 @@ const PostCard = ({ postData : v, idx : i }) => {
           <PostContent dangerouslySetInnerHTML={{ __html: v.content.length > 50 ? v.content.slice(0,50) +' ....' : v.content }} />
         </PostViewerBlock>
       </CenterdDiv>
-        {i % 2 === 0 ?
+        {i !== PostsData?.length - 1 &&  (i % 2 === 0 ?
     (<LineWrapperDiv>
     <LineStyledDiv></LineStyledDiv>
     <CircleDiv></CircleDiv>
@@ -194,9 +194,8 @@ const PostCard = ({ postData : v, idx : i }) => {
     (<LineWrapperDiv>
     <CircleDiv></CircleDiv>
     <LineStyledDiv></LineStyledDiv>
-    </LineWrapperDiv>)}
+    </LineWrapperDiv>))}
         </div>
-      {/* ))} */}
     </div>
   );
 };

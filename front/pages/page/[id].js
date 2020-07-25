@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useMemo } from 'react'
 import Router, { useRouter } from 'next/router';
 import useSWR from 'swr';
 import axios from 'axios';
@@ -6,14 +6,17 @@ import MyLayout from '../../components/MyLayout';
 import moment from 'moment';
 import 'moment/locale/ko'
 import styled from 'styled-components';
-import { message } from 'antd';
-import { useDispatch } from 'react-redux';
-import { DELETE_POST_REQUEST } from '../../reducer/post';
+import { message, Typography } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import { DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST } from '../../reducer/post';
+import { LOAD_MYINFO_REQUEST } from '../../reducer/user';
+import { HeartTwoTone, HeartOutlined } from '@ant-design/icons';
 
 const Containertitle = styled.div`
     display : flex;
     margin-left : 9%;
     h1 { 
+        font-size : 40px;
         margin : 0;
     }
 `
@@ -24,19 +27,6 @@ const DivContainer = styled.div`
     padding-left : 5%;
     padding-right : 5%;
 `
-
-const PostContent = styled.div`
-  font-size: 1.3125rem;
-  color: #434343;
-  overflow : auto;
-  padding-top : 3%;
-  padding-left : 9%;
-  padding-right : 9%;
-  
-  img {
-      width :100%;
-  }
-`;
 
 const BorderDiv = styled.div`
     display : flex;
@@ -53,6 +43,20 @@ const BorderDiv = styled.div`
         font-size : 40px;
     }
 `
+const PostContent = styled.div`
+  font-size: 1.0125rem;
+  color: #434343;
+  overflow : auto;
+  padding-top : 3%;
+  padding-left : 9%;
+  padding-right : 9%;
+
+  img {
+      width :100%;
+  }
+`;
+
+
 
 const QuillStyleDiv = styled.div`
     pre {
@@ -74,15 +78,38 @@ const QuillStyleDiv = styled.div`
     }
 `
 const DivEdit = styled.div`
-display : flex; 
-color : #777;
-justify-content : flex-end;
- margin : 10px 5vw 0px 0px;
- 
+    display : flex; 
+    color : #777;
+
+    justify-content : flex-end;
+    margin : 10px 5vw 0px 0px;
+
+ .tagging {
+    justify-content : flex-start;
+    margin-left : 10vw;
+    }
+
  p {
      cursor: pointer;
      margin : 2px;
  }
+`
+const DivEditOne = styled.div`
+display : flex; 
+color : #777;
+
+margin : 10px 5vw 0px 4vw;
+justify-content : flex-start;
+`
+
+const StyledTags = styled(Typography.Text)`
+    font-size : 12px;
+
+    &:hover {
+        cursor: pointer;
+        color : #4e91cf;
+    }
+
 `
 
 moment.locale('ko')
@@ -94,6 +121,14 @@ const page = () => {
     const router = useRouter();
     const { id } = router.query;
     const { data, error } = useSWR(`http://localhost:3055/post/${id}`, fetcher);
+    const { loginInfo } = useSelector((state) => state.user);
+
+    useEffect(() => {
+        dispatch({
+            type : LOAD_MYINFO_REQUEST,
+        })
+    },[])
+
 
     useEffect(() => {
         if(data === null) {
@@ -112,26 +147,81 @@ const page = () => {
     })
   },[])
 
+const flexDivMemo = useMemo(() => {
+    return {
+        display : 'flex'
+    }
+})
+
+const momentPMemo = useMemo(() => {
+    return { 
+        backgroundColor : '#777',
+        fontWeight :'200',
+        color : 'white',
+        marginRight : '5px',
+     }
+})
+
+const nicknamePMemo = useMemo(() => {
+    return { 
+        display : 'flex',
+        alignItems : 'center',
+        marginRight : '10px'
+    }
+})
+
+const avatarImgMemo = useMemo(() => {
+    return {
+        width : "32px",
+        height:'32px',
+        borderRadius : '50%'
+    }
+})
+
+const divEditContainerMemo = useMemo(() => {
+    return {
+        display : 'flex',
+        width : '100%',
+        justifyContent : 'space-between'
+    }
+})
+
+const searchHashtag = useCallback((tag) => () => {
+    dispatch({
+        type : HASHTAG_SEARCH_REQUEST,
+        data : {
+            name : encodeURIComponent(tag)
+        }
+    })
+    router.pathname.slice(1) && Router.replace('/')
+},[])
+
     
+
     return (
         <MyLayout>
            {data ? <div>
-            <Containertitle><h1 style={{ fontSize : '50px'}}>{data?.title}</h1></Containertitle>
+            <Containertitle><h1>{data?.title}</h1></Containertitle>
             <DivContainer>
-    <div style={{ display : 'flex'}}>
-            <p style={{ backgroundColor : '#777', fontWeight :'200', color : 'white', marginRight : '5px', }} className="moment">{moment(data?.createdAt).fromNow()}</p>
-            <p style={{ display : 'flex', alignItems : 'center', marginRight : '10px'}}>{data?.User?.nickname}</p>
-            <img style={{width : "32px", height:'32px', borderRadius : '50%' }}  src={`http://localhost:3055/${data?.User?.Images[0]?.src}`}/>
+    <div style={flexDivMemo}>
+            <p style={momentPMemo} className="moment">{moment(data?.createdAt).fromNow()}</p>
+            <p style={nicknamePMemo}>{data?.User?.nickname}</p>
+            <img style={avatarImgMemo}  src={`http://localhost:3055/${data?.User?.Images[0]?.src}`}/>
     </div>
             </DivContainer>
             <BorderDiv>
                <div className="bode"/>
             </BorderDiv>
-                <DivEdit style={{display : 'flex', color : '#777', justifyContent : 'flex-end', margin : '10px 5vw 0px 0px'}}>
+            <div style={divEditContainerMemo}>
+            <DivEditOne>
+                {data?.Hashtags?.map(v => <StyledTags onClick={searchHashtag(v.name)} keyboard>{v.name}</StyledTags>)}
+            </DivEditOne>
+                {data?.UserId === loginInfo?.id && <DivEdit>
                     <p onClick={() => Router.replace(`/write?PostId=${parseInt(data.id, 10)}`)}>수정</p>
                     <p>/</p>
                     <p onClick={deletePost(data.id)}>삭제</p>
-                </DivEdit>
+                </DivEdit>}
+            </div>
             <PostContent>
             <QuillStyleDiv dangerouslySetInnerHTML={{__html : data?.content}}/>
             </PostContent>

@@ -11,6 +11,7 @@ import Router, { useRouter } from 'next/router';
 import { TOGGLE_TAG } from '../reducer/post';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalForm from './ModalForm';
+import PageNation from './PageNation/PageNation';
 
 const EditBtn = styled(StarFilled)`
 /* border-radius : 50%;
@@ -112,7 +113,7 @@ const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
     return (
       <>
     <RowStyled justify="space-between" align="middle">
-      <Col  xs={24} md={3}  span={4}>
+      <Col xs={24} md={3}  span={4}>
       </Col>
       <ColStyled onScroll={onScrollHandler} xs={24} md={18} span={4}>
         {!queryname && (!resposinveSmall ? <TagBtn onClick={clickTag}/> : <TagBtn onClick={clickTag} style={LeftBtn}/>)}
@@ -123,6 +124,7 @@ const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
       <Col xs={24} md={3}  span={4}>
       </Col>
     </RowStyled>
+        {resposinveSmall ? <PageNation resSmall={true}/> : <PageNation/>}
     <Dropdown placement="topLeft" overlay={<Text code>Write</Text>}>
     {queryname !== 'write' ? (!resposinveSmall ? <EditBtn onClick={onClickWriteBtn}/> : <EditBtn onClick={onClickWriteBtn} style={responsiveSmallBtn}/>) : <div></div>}
     </Dropdown>

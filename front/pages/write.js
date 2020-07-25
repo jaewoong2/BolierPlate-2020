@@ -21,6 +21,7 @@ const write = () => {
     return (
         <MyLayout>
             {router.query.PostId ? <Editor data={data}/> :<Editor /> }
+            {/* 수정으로 들어왔으면 쿼리 PostId가 있다 */}
         </MyLayout>
     )
 }
