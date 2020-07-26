@@ -12,13 +12,13 @@ const Home = () => {
 
     const scrollHandler = useCallback((e) => {
       if(e.target.clientHeight + e.target.scrollTop + 15 > e.target.scrollHeight) {
-        if(!tagName && InfinityScroll && !loadPostsLoading) {
+        if(!PageNation && !tagName && InfinityScroll && !loadPostsLoading) {
           dispatch({
             type : LOAD_POSTS_REQUEST,
             lastId : PostsData[PostsData.length - 1]?.id
           })
         }
-        if(tagName && InfinityScroll && !hashtagSearchLoading) {
+        if(!PageNation && tagName && InfinityScroll && !hashtagSearchLoading) {
           dispatch({
             type : HASHTAG_SEARCH_REQUEST,
             data : { name : encodeURIComponent(tagName)},

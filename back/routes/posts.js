@@ -45,6 +45,9 @@ router.get('/pagenation', removeHtmlAndShorten, async (req, res, next) => {
     try {
         const fullPost = await Post.findAll({
             order : [[ 'createdAt', "DESC"]],
+            include : [{
+                model : Hashtag
+            }],
         })
         res.status(201).json(fullPost)
     } catch(err) {

@@ -7,7 +7,7 @@ import { Avatar, Dropdown, Menu, Typography } from 'antd';
 import Link from 'next/link';
 import moment from 'moment';
 import 'moment/locale/ko'
-import { SmallDashOutlined } from '@ant-design/icons';
+import { SmallDashOutlined, HeartTwoTone, CiCircleTwoTone, SmileOutlined } from '@ant-design/icons';
 import  Router from 'next/router';
 moment.locale('ko')
 
@@ -150,7 +150,7 @@ const PostCard = ({ postData : v, idx : i }) => {
         <PostViewerBlock>
           <PostHead>
               <DivWrapper>
-            <Link href={`/page/${v.id}`}><a><h1>{v.title}</h1></a></Link>
+            <Link href={`/page/${v.id}`}><a><h1>{`${i + 1} .`}{v.title}</h1></a></Link>
               </DivWrapper>
             <SubInfo>
             <span>
@@ -182,19 +182,17 @@ const PostCard = ({ postData : v, idx : i }) => {
               ))}
             </Tags>
           </PostHead>
-          <PostContent dangerouslySetInnerHTML={{ __html: v.content.length > 50 ? v.content.slice(0,50) +' ....' : v.content }} />
+          {/* <PostContent dangerouslySetInnerHTML={{ __html: v.content.length > 50 ? v.content.slice(0,50) +' ....' : v.content }} /> */}
         </PostViewerBlock>
       </CenterdDiv>
-        {i !== PostsData?.length - 1 &&  (i % 2 === 0 ?
-    (<LineWrapperDiv>
-    <LineStyledDiv></LineStyledDiv>
-    <CircleDiv></CircleDiv>
-    </LineWrapperDiv>)
-     :
-    (<LineWrapperDiv>
-    <CircleDiv></CircleDiv>
-    <LineStyledDiv></LineStyledDiv>
-    </LineWrapperDiv>))}
+        {i !== PostsData?.length - 1 &&  Math.floor(i % 2) === 0 &&
+    (<LineWrapperDiv style={{ display : 'flex', justifyContent : 'center' }}>
+    {/* <LineStyledDiv></LineStyledDiv>
+    <CircleDiv></CircleDiv> */}
+    <div  style={{ width : '40%', borderBottom : '2px dashed #777'}}></div>
+    <SmileOutlined  style={{ color:"#50db7eea" , fontSize : 17, marginLeft : 7, marginRight : 7}}/>
+    <div  style={{  width : '40%', borderBottom : '2px dashed #777'}}></div>
+    </LineWrapperDiv>)}
         </div>
     </div>
   );
