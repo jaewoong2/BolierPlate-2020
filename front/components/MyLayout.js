@@ -5,10 +5,10 @@ import NavBar from './NavBar';
 import Editor from './Edit/Editor';
 import PostView from './PostView';
 import PostCard from './PostCard';
-import { EditOutlined, HeartFilled, StarOutlined, StarFilled, TagsOutlined } from '@ant-design/icons';
+import { EditOutlined, HeartFilled, StarOutlined, StarFilled, TagsOutlined, PaperClipOutlined } from '@ant-design/icons';
 import Text from 'antd/lib/typography/Text';
 import Router, { useRouter } from 'next/router';
-import { TOGGLE_TAG } from '../reducer/post';
+import { TOGGLE_TAG, PAGE_NATION_TOGGLE } from '../reducer/post';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalForm from './ModalForm';
 import PageNation from './PageNation/PageNation';
@@ -38,7 +38,15 @@ const TagBtn = styled(TagsOutlined)`
   filter : drop-shadow( 3px 3px 10px #777);
   color : #2085a1c7;
 `
-
+const PageBtn = styled(PaperClipOutlined)`
+  font-size : 40px;
+  position : fixed;
+  right : 17vw;
+  bottom : 19vh;
+  /* box-shadow : 3px 3px 10px #777; */
+  filter : drop-shadow( 3px 3px 10px #777);
+  color : #2085a1c7;
+`
 
 const ColStyled = styled(Col)`
     height : 80vh;
@@ -63,6 +71,7 @@ const MyLayout = ({ children, onScrollHandler }) => {
     const dispatch = useDispatch();
     const router = useRouter();
     const { loginInfo } = useSelector((state) => state.user);
+    const { PageNation : page } = useSelector((state) => state.post);
     const queryname = router.pathname.slice(1);
 
     useEffect(() => {
@@ -98,6 +107,11 @@ const MyLayout = ({ children, onScrollHandler }) => {
         type : TOGGLE_TAG
       })
     },[])
+    const clickPageNation = useCallback(() => {
+      dispatch({
+        type : PAGE_NATION_TOGGLE
+      })
+    },[])
 
     
 const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
@@ -116,7 +130,8 @@ const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
       <Col xs={24} md={3}  span={4}>
       </Col>
       <ColStyled onScroll={onScrollHandler} xs={24} md={18} span={4}>
-        {!queryname && (!resposinveSmall ? <TagBtn onClick={clickTag}/> : <TagBtn onClick={clickTag} style={LeftBtn}/>)}
+      {!queryname && (!resposinveSmall ? <TagBtn onClick={clickTag}/> : <TagBtn onClick={clickTag} style={LeftBtn}/>)}
+      {!queryname && (!resposinveSmall ? <PageBtn onClick={clickPageNation}/> : <PageBtn onClick={clickPageNation} style={responsiveSmallBtn}/>)}
             <NavBar />
             {children}
     {visible && <ModalForm setting={setting} setVisible={setVisible} visible={visible}/>}
@@ -124,7 +139,7 @@ const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
       <Col xs={24} md={3}  span={4}>
       </Col>
     </RowStyled>
-        {resposinveSmall ? <PageNation resSmall={true}/> : <PageNation/>}
+        {page && (resposinveSmall ? <PageNation resSmall={true}/> : <PageNation/>)}
     <Dropdown placement="topLeft" overlay={<Text code>Write</Text>}>
     {queryname !== 'write' ? (!resposinveSmall ? <EditBtn onClick={onClickWriteBtn}/> : <EditBtn onClick={onClickWriteBtn} style={responsiveSmallBtn}/>) : <div></div>}
     </Dropdown>

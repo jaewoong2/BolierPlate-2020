@@ -41,4 +41,15 @@ router.get('/', removeHtmlAndShorten, async (req, res, next) => {
     }
 })
 
+router.get('/pagenation', removeHtmlAndShorten, async (req, res, next) => {
+    try {
+        const fullPost = await Post.findAll({
+            order : [[ 'createdAt', "DESC"]],
+        })
+        res.status(201).json(fullPost)
+    } catch(err) {
+        console.error(err)
+        next(err)
+    }
+})
 module.exports = router;

@@ -7,7 +7,7 @@ import { LOAD_POSTS_REQUEST, HASHTAG_SEARCH_REQUEST } from '../reducer/post'
 import { LOAD_MYINFO_REQUEST } from '../reducer/user'
 
 const Home = () => {
-  const { toggleTag, InfinityScroll, PostsData, loadPostsLoading, hashtagSearchLoading, tagName } =  useSelector(state => state.post);
+  const { toggleTag, InfinityScroll, PostsData, loadPostsLoading, hashtagSearchLoading, tagName, PageNation } =  useSelector(state => state.post);
   const dispatch = useDispatch();
 
     const scrollHandler = useCallback((e) => {
@@ -26,9 +26,6 @@ const Home = () => {
           })
         }
       }
-
-     
-      
   },[InfinityScroll, PostsData, loadPostsLoading, hashtagSearchLoading, tagName])
 
     
@@ -47,7 +44,7 @@ const Home = () => {
 
   useEffect(() => {
     if(PostsData?.length === 5) {
-      if(!tagName && InfinityScroll && !loadPostsLoading) {
+      if(!PageNation && !tagName && InfinityScroll && !loadPostsLoading) {
         dispatch({
           type : LOAD_POSTS_REQUEST,
           lastId : PostsData[PostsData.length - 1]?.id

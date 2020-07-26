@@ -88,11 +88,12 @@ function Base64toServerImage(fullstring) {
 
 
 const Editor = ({ data }) => {
-  const { wrtieLoading, wrtieDone, ImagePaths, uploadImagesDone } = useSelector((state) => state.post)
+  const { wrtieLoading,wrtieError, wrtieDone, ImagePaths, uploadImagesDone } = useSelector((state) => state.post)
   const { loginInfo, loadUserInfoLoading, loadUserInfoDone } = useSelector((state) => state.user)
   
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [count, setCount] = useState(0);
   const [images, setImages] = useState(ImagePaths)
   const [hashtag, setHashtag, hashtagChange] = UseInput('');
   const [hashtagArr, setHashtagArr] = useState([]);
@@ -123,6 +124,13 @@ const Editor = ({ data }) => {
       }
     },[data, loginInfo, loadUserInfoDone, loadUserInfoLoading])
 
+    useEffect(() => {
+     count && !wrtieError && !wrtieLoading && wrtieDone && (() => {
+        message.info('글 올리기 성공!')
+        Router.replace('/')
+      })()
+      count && wrtieError && message.warn('글 올리기 실패...')
+  },[wrtieDone, wrtieLoading, wrtieError, count])
 
    
     useEffect(() => { // 수정!
@@ -158,18 +166,12 @@ const Editor = ({ data }) => {
           setTitle(data.title)
           setContent(data.content)
           setHashtagArr(data.Hashtags?.map(v => v.name)) 
-          quillInstance.current.root.innerHTML = data.content
+          quillInstance.current.root.innerHTML = data.content;
         }
       }
     },[data, quillInstance?.current?.root])
 
-    useEffect(() => { // 글 쓰면 초기화
-      if(!wrtieLoading && wrtieDone) { 
-        setTitle('');
-        setContent('');
-        quillInstance.current.root.innerHTML = '<p></br></p>';
-      }
-    },[wrtieLoading, wrtieDone])
+   
     
     useEffect(() =>{
       if(title.lnegth > 200) {
@@ -267,6 +269,7 @@ const Editor = ({ data }) => {
           }
         })
       }
+      setCount(prev => prev + 1);
     },[title, content, ImagePaths, data, hashtagArr])
     
     const onClickImageBtn = useCallback(() => {

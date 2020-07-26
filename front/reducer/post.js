@@ -21,6 +21,7 @@ const initialState = {
   hashtagSearchDone : false,
   hashtagSearchError: null,
 
+  PageNation : false,
   InfinityScroll : true,
   toggleTag : false,
   tagName : '',
@@ -29,6 +30,7 @@ const initialState = {
 };
 
 export const TOGGLE_TAG = 'TOGGLE_TAG';
+export const PAGE_NATION_TOGGLE ='PAGE_NATION_TOGGLE';
 
 export const WRTIE_REQUEST = "WRTIE_REQUEST";
 export const WRTIE_SUCCESS = "WRTIE_SUCCESS";
@@ -49,7 +51,6 @@ export const DELETE_POST_FAILURE = 'DELETE_POST_FAILURE'
 export const HASHTAG_SEARCH_REQUEST = 'HASHTAG_SEARCH_REQUEST'
 export const HASHTAG_SEARCH_SUCCESS = 'HASHTAG_SEARCH_SUCCESS'
 export const HASHTAG_SEARCH_FAILURE = 'HASHTAG_SEARCH_FAILURE'
-
 
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
@@ -78,8 +79,8 @@ const reducer = (state = initialState, action) => {
       case LOAD_POSTS_SUCCESS:
         draft.loadPostsLoading = false;
         draft.loadPostsDone = true;
-        draft.PostsData = draft.PostsData ? (draft.tagName ? action.data : draft.PostsData.concat(action.data)) : action.data;
-        draft.InfinityScroll = action.data.length === 5 ? true : false;
+        draft.PostsData = draft.PageNation ? (action.data) : (draft.PostsData ? (draft.tagName ? action.data : draft.PostsData.concat(action.data)) : action.data);
+        draft.InfinityScroll = draft.PageNation ? false : (action.data.length === 5 ? true : false) ;
         draft.tagName = '';
         break;
       case LOAD_POSTS_FAILURE:
@@ -130,7 +131,7 @@ const reducer = (state = initialState, action) => {
           case HASHTAG_SEARCH_SUCCESS:
             draft.hashtagSearchLoading = false;
             draft.hashtagSearchDone = true;
-            draft.PostsData = (draft.tagName && (draft.tagName === action.tagName)) ? draft.PostsData.concat(action.data) : action.data;
+            draft.PostsData = draft.PageNation ? action.data : (draft.tagName && (draft.tagName === action.tagName)) ? draft.PostsData.concat(action.data) : action.data;
             draft.InfinityScroll = action?.data?.length === 5 ? true : false;
             draft.tagName = action.tagName;
             draft.toggleTag = true;
@@ -146,6 +147,9 @@ const reducer = (state = initialState, action) => {
             draft.toggleTag = !draft.toggleTag;
             break;
 
+          case PAGE_NATION_TOGGLE :
+            draft.PageNation = !draft.PageNation;
+            draft.InfinityScroll = false;
       default:
         break;
     }

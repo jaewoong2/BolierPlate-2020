@@ -9,6 +9,10 @@ const fs = require('fs');
 const { removeHtmlAndShorten } = require('./sanitizeMiddle');
 const { Hash } = require('crypto');
 const { Op } = require('sequelize');
+const axios = require('axios');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 try {
     fs.accessSync('uploads');
@@ -84,7 +88,10 @@ router.post('/', removeHtmlAndShorten ,async (req, res, next) => {
                 model : Comment,
                 Include : [{
                     model : User,
-                    attributes : ['id', 'nickname']
+                    attributes : ['id', 'nickname'],
+                    include : [{
+                        model : Image
+                    }]
                 }]
             }, {
                 model : User,

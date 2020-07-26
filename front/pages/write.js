@@ -14,10 +14,7 @@ const write = () => {
     const router = useRouter();
     const { data, error } = useSWR(`http://localhost:3055/post/${router.query.PostId}`, fetcher);
 
-    useEffect(() => {
-        !wrtieLoading && wrtieDone && Router.replace('/')
-    },[wrtieDone, wrtieLoading])
-
+ 
     return (
         <MyLayout>
             {router.query.PostId ? <Editor data={data}/> :<Editor /> }
