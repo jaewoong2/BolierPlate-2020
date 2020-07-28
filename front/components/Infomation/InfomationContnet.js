@@ -1,11 +1,12 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import useSWR from "swr";
 import axios from "axios";
 import styled from "styled-components";
 import { Input, Avatar, Card } from "antd";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Form from "antd/lib/form/Form";
 import { EditOutlined } from "@ant-design/icons";
+import { COVER_POST } from "../../reducer/post";
 
 
 const StyledAvartar = styled(Avatar)`
@@ -46,7 +47,9 @@ const fetcher = (url) => {
 const InfomationContnet = () => {
     const { CoverUserId } = useSelector(state => state.post)
     const { data, error } = useSWR(`http://localhost:3055/user/${CoverUserId}`, fetcher) 
-    
+    const dispatch = useDispatch();  
+
+
     const cardUseMemo = useMemo(() => {
         return {
             border : 0,
@@ -57,6 +60,10 @@ const InfomationContnet = () => {
             marginLeft : '0',
         }
     },[])
+
+
+
+
 
   return (
     <div>

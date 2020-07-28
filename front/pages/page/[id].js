@@ -8,7 +8,7 @@ import 'moment/locale/ko'
 import styled from 'styled-components';
 import { message, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST } from '../../reducer/post';
+import { DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST, COVER_POST } from '../../reducer/post';
 import { LOAD_MYINFO_REQUEST } from '../../reducer/user';
 import { HeartTwoTone, HeartOutlined } from '@ant-design/icons';
 
@@ -26,6 +26,22 @@ const DivContainer = styled.div`
     justify-content : flex-end;
     padding-left : 5%;
     padding-right : 5%;
+
+    p {
+        &:hover {
+            cursor : pointer;
+        }
+    }
+    img {
+        &:hover {
+            cursor : pointer;
+        }
+    }
+    .moment {
+        &:hover {
+            cursor : initial;
+        }
+    }
 `
 
 const BorderDiv = styled.div`
@@ -122,6 +138,7 @@ const page = () => {
     const { id } = router.query;
     const { data, error } = useSWR(`http://localhost:3055/post/${id}`, fetcher);
     const { loginInfo } = useSelector((state) => state.user);
+    const { CoverUp } = useSelector((state) => state.post);
 
     useEffect(() => {
         dispatch({
@@ -135,7 +152,6 @@ const page = () => {
                 message.error('존재하지않는 게시물...')
                 Router.back();
         }
-        console.log(data)
     },[data, error])
     
   const deletePost = useCallback((id) => () => {
@@ -196,17 +212,28 @@ const searchHashtag = useCallback((tag) => () => {
     router.pathname.slice(1) && Router.replace('/')
 },[])
 
-    
+    const onClickMyInfo = useCallback(() => {
+        dispatch({
+            type : COVER_POST,
+            id : data?.UserId
+        })
+    },[data])    
+
+    const onClickCoverDown = useCallback((e) => {
+        CoverUp && dispatch({
+            type : COVER_POST,
+        })
+    },[CoverUp])
 
     return (
         <MyLayout>
-           {data ? <div>
+           {data ? <div onClick={onClickCoverDown}>
             <Containertitle><h1>{data?.title}</h1></Containertitle>
             <DivContainer>
     <div style={flexDivMemo}>
             <p style={momentPMemo} className="moment">{moment(data?.createdAt).fromNow()}</p>
-            <p style={nicknamePMemo}>{data?.User?.nickname}</p>
-            <img style={avatarImgMemo}  src={`http://localhost:3055/${data?.User?.Images[0]?.src}`}/>
+            <p onClick={onClickMyInfo} style={nicknamePMemo}>{data?.User?.nickname}</p>
+            <img onClick={onClickMyInfo} style={avatarImgMemo}  src={`http://localhost:3055/${data?.User?.Images[0]?.src}`}/>
     </div>
             </DivContainer>
             <BorderDiv>

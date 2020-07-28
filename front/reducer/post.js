@@ -67,7 +67,9 @@ const reducer = (state = initialState, action) => {
       case WRTIE_SUCCESS:
         draft.wrtieLoading = false;
         draft.wrtieDone = true;
-        draft.PostsData.unshift(action.data);
+        action.edit ? 
+        draft.PostsData.map(v => v.id === action.data.id ? action.data : v)
+        : draft.PostsData.unshift(action.data);
         break;
       case WRTIE_FAILURE:
         draft.wrtieLoading = false;
@@ -83,8 +85,8 @@ const reducer = (state = initialState, action) => {
       case LOAD_POSTS_SUCCESS:
         draft.loadPostsLoading = false;
         draft.loadPostsDone = true;
-        draft.PostsData = draft.PageNation
-          ? action.data
+        draft.PostsData = draft.PageNation // 페이지 넘김 
+          ? action.data // 페이지를 넘기기가 가능하면 다음 
           : draft.PostsData
           ? draft.tagName
             ? action.data

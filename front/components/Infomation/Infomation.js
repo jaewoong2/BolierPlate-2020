@@ -1,25 +1,26 @@
-import React, { useMemo, useEffect, useRef, useState } from 'react'
+import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react'
 import styled from 'styled-components'
-import { useSelector } from 'react-redux'
-import { Col } from 'antd'
+import { useSelector, useDispatch } from 'react-redux'
+import { Col, Row } from 'antd'
 import { useRouter } from 'next/router'
 import InfomationContnet from './InfomationContnet'
+import { COVER_POST } from '../../reducer/post'
 
-const StyledDivForWrapperFlex = styled.div`
+const StyledDivForWrapperFlex = styled(Row)`
+        width : 100%;
+        height : 0%;
         display : flex;
         justify-content : center;
         align-items : flex-end;
-        width : 100vw;
-        height : 100vh;
+        background-color : yellow;
         transition : height 0.5s linear;
-        background-color : inherit;
     `
 const StyledDivForContent = styled(Col)`
     display : flex;
     justify-content : center;
     bottom : 10vh;
     width : 100%;
-    height : 70%;
+    height : 0%;
     position : fixed;
     background-color : #ffffffff;
     border : 0.1px solid #2622eed8;
@@ -33,6 +34,7 @@ const StyledDivForContent = styled(Col)`
 
 const Infomation = () => {
     const { CoverUp, CoverUserId } = useSelector(state => state.post)
+    const dispatch = useDispatch()
     const [normal, setNormal] = useState({});
     const router = useRouter();
 
@@ -46,14 +48,16 @@ const Infomation = () => {
             })
     },[CoverUp])
 
-    if(router.pathname.slice(1)) {
-        return <div></div>
-    }
 
+    if(!router.pathname.slice(1).includes('page/') && router.pathname.slice(1)) {
+        return <div></div>;
+    }
+    
+    
     return (
-        <StyledDivForWrapperFlex  style={normal}>
+        <StyledDivForWrapperFlex>
            <StyledDivForContent name="cover" style={normal} xs={20} md={16}>
-            {CoverUp && CoverUserId && <InfomationContnet UserId={CoverUserId} / >}
+            {CoverUp && CoverUserId && <InfomationContnet />}
             </StyledDivForContent>
         </StyledDivForWrapperFlex>
     )

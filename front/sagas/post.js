@@ -8,16 +8,24 @@ function writeAPI(data) {
     if(data.edit) {
         return axios.patch('/post', data);
     } else {
-        return axios.post('/post', data)
+        return axios.post('/post', data);
     }
 }
 
 function* write(action) {
     try {  
         const result = yield call(writeAPI, action.data);
-        yield put({
+
+        yield action.data.edit === false && put({
             type : WRTIE_SUCCESS,
-            data : result.data
+            data : result.data,
+            edit : false,
+        })
+
+        yield action.data.edit && put({
+            type : WRTIE_SUCCESS,
+            data : result.data,
+            edit : true
         })
         
     } catch(err) {

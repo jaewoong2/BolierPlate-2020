@@ -64,8 +64,17 @@ const SubInfo = styled.div`
   color: #434343;
   float : right;
 
+  img {
+    &:hover {
+      cursor : pointer;
+    }
+  }
   b {
     font-size : 11.5px;
+    &:hover {
+      color : #777;
+      cursor : pointer;
+    }
   }
   /* span 사이에 가운뎃점 문자 보여 주기 */
   span + span:before {
@@ -111,6 +120,22 @@ const DivWrapper = styled.div`
     display : flex;
     justify-content : space-between;
     align-items : center;
+
+    span {
+      color : #686767;
+      font-style : italic;
+    }
+
+    .title {
+      &:hover {
+        color : #526a7e;
+        font-weight : bolder;
+      }
+    }
+
+    a{
+      display : flex;
+    }
     
 `
 
@@ -152,37 +177,48 @@ const onClickUser = useCallback(() => {
     type : COVER_POST,
     id : v?.UserId
   })
-  CoverUp && v?.UserId === CoverUserId && dispatch({
-    type : COVER_POST,
-  })
 },[CoverUp, CoverUserId])
 
+const onClickEmpty = useCallback((e) => {
+  CoverUp 
+  && e.target.nodeName !== 'B' 
+  && e.target.nodeName !== 'IMG' 
+  && dispatch({
+    type : COVER_POST
+  })
+},[CoverUp])
+
+
+if(!v && !i) {
+  return <div></div>
+}
+
   return (
-    <div>
+    <div onClick={onClickEmpty}>
         <div key={v + i + 'post' + Math.random() * 300}>
 <CenterdDiv>
         <PostViewerBlock>
           <PostHead>
               <DivWrapper>
-            <Link href={`/page/${v.id}`}><a><h1>{i + 1} .{v.title}</h1></a></Link>
+            <Link href={`/page/${v?.id}`}><a><h1 className="title"><span className="number">{i + 1} .</span>{v?.title}</h1></a></Link>
               </DivWrapper>
             <SubInfo>
             <span onClick={onClickUser}>
-              {v.User?.Images && 
+              {v?.User?.Images && 
               <AvartarStyle
                 size={24}
                 src={`http://localhost:3055/${v.User?.Images[0]?.src}`}
               ></AvartarStyle>}
-              <b >{v.User?.nickname}</b>
+              <b>{v?.User?.nickname}</b>
             </span>
-              <span>{moment(v.createdAt).format('YYYY.MM.DD')}</span>
+              <span>{moment(v?.createdAt).format('YYYY.MM.DD')}</span>
               <span className="edit">{v?.UserId === loginInfo?.id ? 
               <Dropdown 
               placement="bottomRight" 
               overlay={
                 <Menu>
-                <Menu.Item onClick={() => Router.replace(`/write?PostId=${v.id}`)}>수정</Menu.Item>
-                <Menu.Item onClick={deletePost(v.id)}>삭제</Menu.Item>
+                <Menu.Item onClick={() => Router?.replace(`/write?PostId=${v?.id}`)}>수정</Menu.Item>
+                <Menu.Item onClick={deletePost(v?.id)}>삭제</Menu.Item>
                 </Menu>
             }>
               <SmallDashOutlined/>
@@ -192,7 +228,7 @@ const onClickUser = useCallback(() => {
             </SubInfo>
             <Tags>
               {v?.Hashtags?.map((tags, index) => (
-                 <Typography.Text onClick={searchHashtag(tags.name)} key={tags + '_' + index} code className="tag">{tags.name}</Typography.Text>
+                 <Typography.Text onClick={searchHashtag(tags?.name)} key={tags + '_' + index} code className="tag">{tags.name}</Typography.Text>
               ))}
             </Tags>
           </PostHead>

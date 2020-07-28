@@ -11,6 +11,19 @@ import UseInput from "../Hooks/UseInput";
 import { HASHTAG_SEARCH_REQUEST, LOAD_POSTS_REQUEST, COVER_POST } from "../reducer/post";
 import Infomation from "./Infomation/Infomation";
 
+const StyledDivForLogo = styled.div`
+  width : 40px;
+  
+  img {
+    width : 100%;
+    &:hover {
+      transform : rotate(45deg);
+    }
+    transition : transform 0.3s;
+  }
+ 
+
+`
 const DivWrapper = styled.div`
   position : sticky;
   top : 0;
@@ -28,13 +41,6 @@ const StyledMenuForInputSearch = styled(Menu.Item)`
   `
 
 const StyledInputSearch = styled(Input.Search)`
-  
-  input {
-  }
-  span {
-  }
-  .ant-btn-primary {
-  }
 `
 
 const NavBar = () => {
@@ -141,8 +147,7 @@ const FullDIv = useMemo(() => {
       // selectedKeys={[current]}
       mode="horizontal"
     >
-      <Menu.Item key="logo" onClick={onBackClick} style={LogoStyleMemo} icon={<div style={{width : '40px'}}><img style={{ width : '100%' }} src="http://localhost:3055/뼈다구.png" /></div>}  />
-      <Menu.Item key="back" onClick={onBackClick} icon={<InfoCircleOutlined/>} />
+      <Menu.Item key="logo" onClick={onBackClick} style={LogoStyleMemo} icon={<StyledDivForLogo><img src="http://localhost:3055/뼈다구.png" /></StyledDivForLogo>}  />
       <StyledMenuForInputSearch style={{borderBottomWidth: '0px'}}>
           <Popover placement="right" title={null} content={<StyledInputSearch placeholder="찾고 싶은 태그가 있나요?" loading={hashtagSearchLoading} onPressEnter={searchHashtag} onSearch={searchHashtag} onChange={onChangeTag} value={tag}/>} trigger="click">
             <div style={FullDIv}>

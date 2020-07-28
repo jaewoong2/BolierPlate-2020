@@ -108,6 +108,7 @@ const MyLayout = ({ children, onScrollHandler }) => {
         type : TOGGLE_TAG
       })
     },[])
+    
     const clickPageNation = useCallback(() => {
       dispatch({
         type : PAGE_NATION_TOGGLE
@@ -142,8 +143,8 @@ const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
       <ColStyled onScroll={onScrollHandler} xs={24} md={18} span={4}>
       {!queryname && (!resposinveSmall ? <TagBtn onClick={clickTag}/> : <TagBtn onClick={clickTag} style={LeftBtn}/>)}
       {!queryname && (!resposinveSmall ? <PageBtn onClick={clickPageNation}/> : <PageBtn onClick={clickPageNation} style={responsiveSmallBtn}/>)}
-            <NavBar />
-            {children}
+      <NavBar />
+      {children}
       <Infomation/>
     {visible && <ModalForm setting={setting} setVisible={setVisible} visible={visible}/>}
       </ColStyled>

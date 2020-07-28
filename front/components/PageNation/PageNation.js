@@ -124,13 +124,17 @@ const PageNation = ({ resSmall }) => {
 
   const onClickNextPage = useCallback(() => {
     if (5 * (number + 1) - 1  < data?.length) {
-      setNumber((prev) => {
+       setNumber((prev) => {
         if (5 * (prev + 1) - 1 > data?.length) {
           return prev;
         }
         if (tagData?.length !== 0 && 5 * (prev + 1) - 1 > tagData?.length) {
           return prev;
         }
+        if(data.length === 5 * (prev + 1)) {
+          return prev;
+        }
+
         if (tagName && tagData && !hashtagSearchLoading) {
           dispatch({
             type: HASHTAG_SEARCH_REQUEST,
@@ -155,7 +159,7 @@ const PageNation = ({ resSmall }) => {
   const onClickPreviousPage = useCallback(() => {
     if (tagName) {
       number > 0 &&
-        setNumber((prev) => {
+     setNumber((prev) => {
           if (tagData && tagData[number] && !hashtagSearchLoading) {
             dispatch({
               type: HASHTAG_SEARCH_REQUEST,
