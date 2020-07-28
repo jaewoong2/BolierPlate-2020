@@ -5,6 +5,7 @@ import HashtagSearch from '../components/HashtagSearch'
 import { useSelector, useDispatch } from 'react-redux'
 import { LOAD_POSTS_REQUEST, HASHTAG_SEARCH_REQUEST } from '../reducer/post'
 import { LOAD_MYINFO_REQUEST } from '../reducer/user'
+import Infomation from '../components/Infomation/Infomation'
 
 const Home = () => {
   const { toggleTag, InfinityScroll, PostsData, loadPostsLoading, hashtagSearchLoading, tagName, PageNation } =  useSelector(state => state.post);

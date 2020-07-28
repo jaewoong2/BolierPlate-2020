@@ -214,6 +214,42 @@ router.post('/login', (req, res, next) => {
     })(req, res, next);
 });
 
+
+router.get('/:userid', async (req, res, next) => {
+    try {
+        const userid = parseInt(req.params.userid, 10);
+        if(!userid) {
+            return res.status(403).send('존재 하지않는 유저입니다..')
+        }
+        const user = await User.findOne({
+            where : { id : userid }
+        });
+        if(!user) {
+            return res.status(403).send('로그인 하지 않았습니다')
+        }
+        const fullUser = await User.findOne({
+            where : { id : user.id },
+            attributes : ['email', 'nickname', 'id'],
+            include : [{
+                model : Post
+            }, {
+                model : Image,
+                order : [['DESC']]
+            }, {
+                model : Comment
+            }, {
+                model : Introduce
+            }]
+        });
+        res.status(201).json(fullUser)
+    } catch(err) {
+        console.error(err)
+        next(err)
+    }
+})
+
+
+
 router.post('/logout', (req, res) => {
     req.logout();
     req.session.destroy();

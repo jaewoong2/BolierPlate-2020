@@ -1,6 +1,6 @@
-import { takeLatest, call, fork, all, put, throttle } from "redux-saga/effects"
+import { takeLatest, call, fork, all, put, throttle, delay } from "redux-saga/effects"
 import axios from 'axios';
-import { WRTIE_SUCCESS, WRTIE_FAILURE, WRTIE_REQUEST, LOAD_MYPOST_REQUEST, LOAD_MYPOST_SUCCESS, LOAD_MYPOST_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_SUCCESS, DELETE_POST_REQUEST, DELETE_POST_SUCCESS, DELETE_POST_FAILURE, HASHTAG_SEARCH_REQUEST, HASHTAG_SEARCH_SUCCESS, HASHTAG_SEARCH_FAILURE, LOAD_POSTS_REQUEST, LOAD_POSTS_SUCCESS, LOAD_POSTS_FAILURE } from "../reducer/post";
+import { WRTIE_SUCCESS, WRTIE_FAILURE, WRTIE_REQUEST, LOAD_MYPOST_REQUEST, LOAD_MYPOST_SUCCESS, LOAD_MYPOST_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_SUCCESS, DELETE_POST_REQUEST, DELETE_POST_SUCCESS, DELETE_POST_FAILURE, HASHTAG_SEARCH_REQUEST, HASHTAG_SEARCH_SUCCESS, HASHTAG_SEARCH_FAILURE, LOAD_POSTS_REQUEST, LOAD_POSTS_SUCCESS, LOAD_POSTS_FAILURE, COVER_POST } from "../reducer/post";
 
 
 // 글쓰기
@@ -119,7 +119,7 @@ function hashtagSearchAPI(data, lastId) {
 
 function* hashtagSearch(action) {
     try {  
-         const result = yield call(hashtagSearchAPI, action.data.name, action.lastId)
+        const result = yield call(hashtagSearchAPI, action.data.name, action.lastId)
         yield put({
             type : HASHTAG_SEARCH_SUCCESS,
             data : result.data,
@@ -140,7 +140,14 @@ function* watchHashtagSearch() {
 }
 
 
-
+function* watchCoverUp() {
+    yield takeLatest(COVER_POST, function* (){
+            // yield delay(2000)
+            yield put({
+                type : 'COVER_POST_SUCCESS',
+            })
+    })
+}
 
 
 
@@ -150,6 +157,7 @@ export default function* postSaga() {
         fork(watchLoadPosts),
         fork(watchPostImage),
         fork (watchDeletePost),
-        fork(watchHashtagSearch)
+        fork(watchHashtagSearch),
+        fork(watchCoverUp)
     ])
 }

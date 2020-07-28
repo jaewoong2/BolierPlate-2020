@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { LOAD_MYINFO_REQUEST } from '../reducer/user';
-import { DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST, LOAD_POSTS_REQUEST } from '../reducer/post';
+import { DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST, LOAD_POSTS_REQUEST, COVER_POST } from '../reducer/post';
 import React, { useEffect, useCallback } from 'react'
 import styled from 'styled-components';
 import { Avatar, Dropdown, Menu, Typography } from 'antd';
@@ -78,7 +78,7 @@ const SubInfo = styled.div`
     font-size : 11.5px;
   }
   .edit {
-   margin-right : '4px'
+   margin-right : 4px;
   }
 
 `;
@@ -122,7 +122,7 @@ margin-left: 5px;
 
 const PostCard = ({ postData : v, idx : i }) => {
   const dispatch = useDispatch();
-  const { PostsData } = useSelector(state => state.post)
+  const { CoverUp, PostsData, CoverUserId } = useSelector(state => state.post)
   const { loginInfo } = useSelector((state) => state.user)
 
   const deletePost = useCallback((id) => () => {
@@ -143,6 +143,20 @@ const PostCard = ({ postData : v, idx : i }) => {
     })
 },[])
 
+const onClickUser = useCallback(() => {
+  dispatch({
+    type : COVER_POST,
+    id : v?.UserId
+  })
+  CoverUp && v?.UserId !== CoverUserId && dispatch({
+    type : COVER_POST,
+    id : v?.UserId
+  })
+  CoverUp && v?.UserId === CoverUserId && dispatch({
+    type : COVER_POST,
+  })
+},[CoverUp, CoverUserId])
+
   return (
     <div>
         <div key={v + i + 'post' + Math.random() * 300}>
@@ -150,16 +164,16 @@ const PostCard = ({ postData : v, idx : i }) => {
         <PostViewerBlock>
           <PostHead>
               <DivWrapper>
-            <Link href={`/page/${v.id}`}><a><h1>{`${i + 1} .`}{v.title}</h1></a></Link>
+            <Link href={`/page/${v.id}`}><a><h1>{i + 1} .{v.title}</h1></a></Link>
               </DivWrapper>
             <SubInfo>
-            <span>
+            <span onClick={onClickUser}>
               {v.User?.Images && 
               <AvartarStyle
                 size={24}
                 src={`http://localhost:3055/${v.User?.Images[0]?.src}`}
               ></AvartarStyle>}
-              <b>{v.User?.nickname}</b>
+              <b >{v.User?.nickname}</b>
             </span>
               <span>{moment(v.createdAt).format('YYYY.MM.DD')}</span>
               <span className="edit">{v?.UserId === loginInfo?.id ? 

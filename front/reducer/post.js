@@ -21,14 +21,18 @@ const initialState = {
   hashtagSearchDone: false,
   hashtagSearchError: null,
 
+  
+  CoverUserId : null,
   PageNation: false,
   InfinityScroll: true,
   toggleTag: false,
+  CoverUp : false,
+  CoverUpLoading : false,
   tagName: "",
   ImagePaths: [],
   PostsData: [],
 };
-
+export const COVER_POST = 'COVER_POST';
 export const TOGGLE_TAG = "TOGGLE_TAG";
 export const PAGE_NATION_TOGGLE = "PAGE_NATION_TOGGLE";
 
@@ -165,8 +169,20 @@ const reducer = (state = initialState, action) => {
       case PAGE_NATION_TOGGLE:
         draft.PageNation = !draft.PageNation;
         draft.InfinityScroll = !draft.InfinityScroll;
-      default:
         break;
+        
+        case COVER_POST : 
+        draft.CoverUpLoading = true;
+        draft.CoverUserId = action.id;
+        draft.CoverUp = !draft.CoverUp;
+        break;
+        case 'COVER_POST_SUCCESS' : 
+        draft.CoverUpLoading = false;
+        break;
+
+
+        default:
+          break;
     }
   });
 };

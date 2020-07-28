@@ -8,10 +8,11 @@ import PostCard from './PostCard';
 import { EditOutlined, HeartFilled, StarOutlined, StarFilled, TagsOutlined, PaperClipOutlined } from '@ant-design/icons';
 import Text from 'antd/lib/typography/Text';
 import Router, { useRouter } from 'next/router';
-import { TOGGLE_TAG, PAGE_NATION_TOGGLE } from '../reducer/post';
+import { TOGGLE_TAG, PAGE_NATION_TOGGLE, COVER_POST } from '../reducer/post';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalForm from './ModalForm';
 import PageNation from './PageNation/PageNation';
+import Infomation from './Infomation/Infomation';
 
 const EditBtn = styled(StarFilled)`
 /* border-radius : 50%;
@@ -71,7 +72,7 @@ const MyLayout = ({ children, onScrollHandler }) => {
     const dispatch = useDispatch();
     const router = useRouter();
     const { loginInfo } = useSelector((state) => state.user);
-    const { PageNation : page } = useSelector((state) => state.post);
+    const { CoverUp, CoverUpLoading, PageNation : page } = useSelector((state) => state.post);
     const queryname = router.pathname.slice(1);
 
     useEffect(() => {
@@ -113,6 +114,15 @@ const MyLayout = ({ children, onScrollHandler }) => {
       })
     },[])
 
+    const clickCoverUp = useCallback((e) => {
+      if(e.currentTarget !== e.target) {
+        return 
+      }
+      CoverUp && dispatch({
+        type : COVER_POST
+      })
+    },[CoverUp])
+
     
 const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
   if(!loginInfo?.id) {
@@ -126,7 +136,7 @@ const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
 
     return (
       <>
-    <RowStyled justify="space-between" align="middle">
+    <RowStyled onClick={clickCoverUp} justify="space-between" align="middle">
       <Col xs={24} md={3}  span={4}>
       </Col>
       <ColStyled onScroll={onScrollHandler} xs={24} md={18} span={4}>
@@ -134,6 +144,7 @@ const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
       {!queryname && (!resposinveSmall ? <PageBtn onClick={clickPageNation}/> : <PageBtn onClick={clickPageNation} style={responsiveSmallBtn}/>)}
             <NavBar />
             {children}
+      <Infomation/>
     {visible && <ModalForm setting={setting} setVisible={setVisible} visible={visible}/>}
       </ColStyled>
       <Col xs={24} md={3}  span={4}>

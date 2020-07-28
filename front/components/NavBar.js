@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect, useMemo } from "react";
 import { Menu, Drawer, Input, Popover } from "antd";
-import { ArrowLeftOutlined, MenuOutlined, SearchOutlined, TagsOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, MenuOutlined, SearchOutlined, TagsOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import SubMenu from "antd/lib/menu/SubMenu";
 import ModalForm from "./ModalForm";
 import Router, { useRouter } from 'next/router'
@@ -8,7 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { LOG_OUT_REQUEST } from "../reducer/user";
 import styled from "styled-components";
 import UseInput from "../Hooks/UseInput";
-import { HASHTAG_SEARCH_REQUEST, LOAD_POSTS_REQUEST } from "../reducer/post";
+import { HASHTAG_SEARCH_REQUEST, LOAD_POSTS_REQUEST, COVER_POST } from "../reducer/post";
+import Infomation from "./Infomation/Infomation";
 
 const DivWrapper = styled.div`
   position : sticky;
@@ -44,7 +45,7 @@ const NavBar = () => {
     const [searchVisible, setSearchVisible] = useState('');
     
     const { loginInfo } = useSelector((state) => state.user)
-    const { tagName , loadPostsLoading, loadPostsDone ,hashtagSearchLoading, hashtagSearchDone } = useSelector((state) => state.post)
+    const { CoverUp, tagName , loadPostsLoading, loadPostsDone ,hashtagSearchLoading, hashtagSearchDone } = useSelector((state) => state.post)
     const dispatch = useDispatch()
     const router = useRouter()
     const queryname = router.pathname.slice(1);
@@ -67,9 +68,12 @@ const NavBar = () => {
     setVisible(prev => !prev);
   },[])
 
-  const onBackClick = useCallback(() => {
-    !queryname && Router.reload();
-    queryname && Router.replace('/')
+  const onBackClick = useCallback((e) => {
+    e.key !== 'back' && !queryname && Router.reload();
+    e.key !== 'back' && queryname && Router.replace('/')
+    // e.key === 'back' && dispatch({
+    //   type : COVER_POST
+    // })
   },[loadPostsLoading, loadPostsDone, queryname, tagName])
   
   
@@ -98,7 +102,8 @@ const NavBar = () => {
 
 const LogoStyleMemo = useMemo(() => {
   return {
-    fontWeight : 'bolder',
+    padding : '0px',
+    margin : '0px',
   }
 },[])
 
@@ -136,10 +141,8 @@ const FullDIv = useMemo(() => {
       // selectedKeys={[current]}
       mode="horizontal"
     >
-      <Menu.Item key="back" onClick={onBackClick} icon={<ArrowLeftOutlined />} />
-      <Menu.Item key="logo" onClick={onBackClick} style={LogoStyleMemo}  >
-          Logo
-      </Menu.Item>
+      <Menu.Item key="logo" onClick={onBackClick} style={LogoStyleMemo} icon={<div style={{width : '40px'}}><img style={{ width : '100%' }} src="http://localhost:3055/뼈다구.png" /></div>}  />
+      <Menu.Item key="back" onClick={onBackClick} icon={<InfoCircleOutlined/>} />
       <StyledMenuForInputSearch style={{borderBottomWidth: '0px'}}>
           <Popover placement="right" title={null} content={<StyledInputSearch placeholder="찾고 싶은 태그가 있나요?" loading={hashtagSearchLoading} onPressEnter={searchHashtag} onSearch={searchHashtag} onChange={onChangeTag} value={tag}/>} trigger="click">
             <div style={FullDIv}>

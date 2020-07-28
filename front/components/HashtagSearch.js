@@ -22,6 +22,10 @@ const HashText = styled(Typography.Text)`
     color : #7793acea;
     word-break: keep-all;
     cursor : pointer;
+    &:hover {
+        font-weight : bolder;
+        transition : font-weight 0.1s ease-in-out;
+    }
 `
 
 const fetcher = (url) => axios.get(url, { withCredentials: true })
