@@ -7,6 +7,7 @@ import MyLayout from '../components/MyLayout';
 import { CheckCircleOutlined, PaperClipOutlined, EditOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import { UPLOAD_PROFILE_IMAGES_REQUEST, LOAD_USERINFO_REQUEST, LOAD_MYINFO_REQUEST, CHANGE_NICKNAME_REQUEST, CHANGE_INTRODUCE_REQUEST } from '../reducer/user';
+import InfomationUserPost from '../components/Infomation/InfomationUserPost';
 
 const StyledInput = styled(Input)`
     margin-bottom : 10px;
@@ -50,7 +51,7 @@ const profile = () => {
     const [changeDiscription, setChangeDiscription] = useState(false)
 
     const [textArea, setTextArea] = useState(loginInfo?.Introduces?.map(v => v.content) || '');
-    const [nickname, setNickname] = useState(loginInfo?.nickname || 'Dummy')
+    const [nickname, setNickname] = useState(loginInfo?.nickname)
 
     const imageRef = useRef();
 
@@ -61,11 +62,11 @@ const profile = () => {
         }) 
     },[loginInfo])
     useEffect(() => {
-        changeNicknameLoading && message.info('...닉네임 변경중')
+        changeNicknameLoading && message.info('닉네임 변경중...')
         !changeNicknameLoading && setChangeNickName(false)
     },[changeNicknameLoading])
     useEffect(() => {
-        changeNicknameLoading && message.info('...자기소개 변경중')
+        changeNicknameLoading && message.info('자기소개 변경중...')
         !changeIntroduceLoading && setChangeDiscription(false)
     },[changeIntroduceLoading])
     
@@ -142,10 +143,8 @@ const profile = () => {
             <StyleDiv>
                 <Form encType="multipart/form-data">
                     <input type="file" multiple ref={imageRef} onChange={onChangeImageInput} hidden />
-                    {loginInfo?.Images ?
-            <StyledAvartar onClick={onChangeProfileImage} size={300} src={`http://localhost:3055/${loginInfo?.Images && loginInfo?.Images[0]?.src}`} /> :
-            <StyledAvartar onClick={onChangeProfileImage} size={300} src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
-        }
+                    {loginInfo?.Images &&
+            <StyledAvartar onClick={onChangeProfileImage} size={300} src={`http://localhost:3055/${loginInfo?.Images && loginInfo?.Images[0]?.src}`} />}
                 </Form>
             </StyleDiv>
             <Card style={cardUseMemo}>
@@ -154,6 +153,7 @@ const profile = () => {
             description={loginInfo.email}/>
             {changeDiscription ? <><StyledTextArea autoSize={{minRows: 6, maxRows: 12}} style={{ marginTop : '10px',}} placeholder="엔터버튼 으로 수정 가능 합니다..." onPressEnter={onEnterBtnIntroduce} onChange={onChangeTextArea} value={textArea}/><EditOutlined style={{ color : '#30ace96e'}} onClick={onEnterBtnIntroduce}/></> : <div style={{ marginTop : '10px'}}>{loginInfo?.Introduces && loginInfo?.Introduces[0]?.content}<EditOutlined style={{ color : '#30ace96e'}} onClick={onClickDescription}/></div>}
             </Card>
+            <InfomationUserPost User={loginInfo}/>
             </div>
         </MyLayout>
     )

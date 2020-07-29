@@ -2,11 +2,12 @@ import React, { useMemo, useCallback } from "react";
 import useSWR from "swr";
 import axios from "axios";
 import styled from "styled-components";
-import { Input, Avatar, Card } from "antd";
+import { Input, Avatar, Card, Col } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import Form from "antd/lib/form/Form";
 import { EditOutlined } from "@ant-design/icons";
 import { COVER_POST } from "../../reducer/post";
+import InfomationUserPost from "./InfomationUserPost";
 
 
 const StyledAvartar = styled(Avatar)`
@@ -14,7 +15,6 @@ const StyledAvartar = styled(Avatar)`
     display : flex;
     justify-content : center;
     align-items : center;
-    
     img {
       &:hover {
         width : 130%;
@@ -29,6 +29,8 @@ const StyleDiv = styled.div`
             justify-content : center;
             align-items : flex-start;
             width : 100%;
+            overflow : hidden;
+            padding-bottom : 5vh;
             
 `
 
@@ -45,33 +47,26 @@ const fetcher = (url) => {
 }
 
 const InfomationContnet = () => {
-    const { CoverUserId } = useSelector(state => state.post)
+    const { CoverUserId, CoverUpLoading } = useSelector(state => state.post)
     const { data, error } = useSWR(`http://localhost:3055/user/${CoverUserId}`, fetcher) 
     const dispatch = useDispatch();  
 
 
     const cardUseMemo = useMemo(() => {
         return {
-            border : 0,
-            borderTop : '2px dashed #54a1e96e', 
-            height : '80%',
-            marginTop : '35px',
-            width  : '60vw',
-            marginLeft : '0',
+          marginLeft : '10px',
+          marginBottom :  '30px',
+          width : '100%',
         }
     },[])
 
-
-
-
-
   return (
-    <div>
+    <Col xs={24} md={24}> 
     <StyleDiv>
       <StyledDivForImage>
           {data?.Images &&
             <StyledAvartar
-              size={250}
+            size={250}
               src={`http://localhost:3055/${
                 data?.Images && data?.Images[0]?.src
               }`}
@@ -79,11 +74,11 @@ const InfomationContnet = () => {
           }
       </StyledDivForImage>
       </StyleDiv>
-      <div>
-      <Card style={cardUseMemo}>
-        <Card.Meta
+      <Col>
+      <Col style={cardUseMemo}>
+        <Card.Meta 
           title={
-            <div name="dbl">
+            <div>
                 {data?.nickname}
               </div>
           }
@@ -91,13 +86,11 @@ const InfomationContnet = () => {
         />
           <div style={{ marginTop: "10px" }}>
             {data?.Introduces && data?.Introduces[0]?.content}
-            <EditOutlined
-              style={{ color: "#30ace96e" }}
-            />
           </div>
-      </Card>
-    </div>
-    </div>
+      </Col>
+      <InfomationUserPost User={data}/>
+    </Col>
+    </Col> 
   );
 };
 

@@ -13,7 +13,7 @@ const StyledDivForWrapperFlex = styled(Row)`
         justify-content : center;
         align-items : flex-end;
         background-color : yellow;
-        transition : height 0.5s linear;
+        transition : height 0.4s ease-in;
     `
 const StyledDivForContent = styled(Col)`
     display : flex;
@@ -27,13 +27,13 @@ const StyledDivForContent = styled(Col)`
     border-bottom : 0;
     box-shadow : 4px 4px 10px #777;
     border-radius : 50px 50px 0px 0px;
-    z-index : 4;
-    transition : height 0.5s linear;
+    z-index : 1;
+    transition : height 0.4s ease-in;
 `
 
 
 const Infomation = () => {
-    const { CoverUp, CoverUserId } = useSelector(state => state.post)
+    const { CoverUp, CoverUserId, CoverUpLoading } = useSelector(state => state.post)
     const dispatch = useDispatch()
     const [normal, setNormal] = useState({});
     const router = useRouter();
@@ -56,8 +56,8 @@ const Infomation = () => {
     
     return (
         <StyledDivForWrapperFlex>
-           <StyledDivForContent name="cover" style={normal} xs={20} md={16}>
-            {CoverUp && CoverUserId && <InfomationContnet />}
+           <StyledDivForContent style={normal} xs={20} md={16}>
+            {CoverUp && CoverUserId &&<InfomationContnet />}
             </StyledDivForContent>
         </StyledDivForWrapperFlex>
     )

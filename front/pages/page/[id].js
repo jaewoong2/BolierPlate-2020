@@ -15,6 +15,7 @@ import { HeartTwoTone, HeartOutlined } from '@ant-design/icons';
 const Containertitle = styled.div`
     display : flex;
     margin-left : 9%;
+    overflow : auto;
     h1 { 
         font-size : 40px;
         margin : 0;

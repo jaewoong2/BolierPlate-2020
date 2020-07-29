@@ -150,7 +150,6 @@ function* watchHashtagSearch() {
 
 function* watchCoverUp() {
     yield takeLatest(COVER_POST, function* (){
-            // yield delay(2000)
             yield put({
                 type : 'COVER_POST_SUCCESS',
             })

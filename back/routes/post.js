@@ -71,7 +71,6 @@ router.post('/', removeHtmlAndShorten ,async (req, res, next) => {
 
         if(req.body.hashtag) {
                 const hashtags = await Promise.all(req.body.hashtag.map((hashtag) => {
-                    console.log(hashtag)
                     return Hashtag.findOrCreate({ 
                         where : { name : hashtag.toLowerCase() }
                     })

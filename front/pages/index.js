@@ -14,13 +14,13 @@ const Home = () => {
     const scrollHandler = useCallback((e) => {
       if(e.target.clientHeight + e.target.scrollTop + 15 > e.target.scrollHeight) {
         if(!PageNation && !tagName && InfinityScroll && !loadPostsLoading) {
-          dispatch({
+          e.target === e.currentTarget && dispatch({
             type : LOAD_POSTS_REQUEST,
             lastId : PostsData[PostsData.length - 1]?.id
           })
         }
         if(!PageNation && tagName && InfinityScroll && !hashtagSearchLoading) {
-          dispatch({
+          e.target === e.currentTarget && dispatch({
             type : HASHTAG_SEARCH_REQUEST,
             data : { name : encodeURIComponent(tagName)},
             lastId : PostsData[PostsData.length - 1]?.id
@@ -51,7 +51,14 @@ const Home = () => {
           lastId : PostsData[PostsData.length - 1]?.id
         })
       }
-    }
+      if(!PageNation && tagName && InfinityScroll && !loadPostsLoading) {
+        dispatch({
+          type : HASHTAG_SEARCH_REQUEST,
+          data : { name : encodeURIComponent(tagName)},
+          lastId : PostsData[PostsData.length - 1]?.id
+        })
+      }
+      }
   },[PostsData,
     tagName,
     InfinityScroll,
