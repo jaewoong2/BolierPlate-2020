@@ -3,7 +3,6 @@ import { Row, Col, Dropdown } from 'antd'
 import styled from 'styled-components';
 import NavBar from './NavBar';
 import Editor from './Edit/Editor';
-import PostView from './PostView';
 import PostCard from './PostCard';
 import { EditOutlined, HeartFilled, StarOutlined, StarFilled, TagsOutlined, PaperClipOutlined } from '@ant-design/icons';
 import Text from 'antd/lib/typography/Text';

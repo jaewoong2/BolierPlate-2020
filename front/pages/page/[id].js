@@ -8,9 +8,11 @@ import 'moment/locale/ko'
 import styled from 'styled-components';
 import { message, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST, COVER_POST } from '../../reducer/post';
+import { DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST, COVER_POST, LOAD_ONE_POST_REQUEST } from '../../reducer/post';
 import { LOAD_MYINFO_REQUEST } from '../../reducer/user';
 import { HeartTwoTone, HeartOutlined } from '@ant-design/icons';
+import CommentInput from '../../components/Comment/CommentInput';
+import CommentContainer from '../../components/Comment/CommentContainer';
 
 const Containertitle = styled.div`
     display : flex;
@@ -130,16 +132,14 @@ const StyledTags = styled(Typography.Text)`
 `
 
 moment.locale('ko')
-const fetcher = (url) => axios.get(url, { withCredentials: true })
-    .then((result) => result.data);
 
 const page = () => {
     const dispatch = useDispatch();
     const router = useRouter();
     const { id } = router.query;
-    const { data, error } = useSWR(`http://localhost:3055/post/${id}`, fetcher);
     const { loginInfo } = useSelector((state) => state.user);
-    const { CoverUp } = useSelector((state) => state.post);
+    const { CoverUp, onePost : data, submitCommentDone, submitCommentLoding } = useSelector((state) => state.post);
+
 
     useEffect(() => {
         dispatch({
@@ -147,13 +147,19 @@ const page = () => {
         })
     },[])
 
+    useEffect(() => {
+        dispatch({
+            type : LOAD_ONE_POST_REQUEST,
+            id 
+        })
+    },[submitCommentDone && !submitCommentLoding])
 
     useEffect(() => {
         if(data === null) {
                 message.error('존재하지않는 게시물...')
                 Router.back();
         }
-    },[data, error])
+    },[data])
     
   const deletePost = useCallback((id) => () => {
     dispatch({
@@ -164,6 +170,31 @@ const page = () => {
     })
   },[])
 
+    const searchHashtag = useCallback((tag) => () => {
+        dispatch({
+            type : HASHTAG_SEARCH_REQUEST,
+            data : {
+                name : encodeURIComponent(tag)
+            }
+        })
+        router.pathname.slice(1) && Router.replace('/')
+    },[])
+
+    const onClickMyInfo = useCallback(() => {
+        dispatch({
+            type : COVER_POST,
+            id : data?.UserId
+        })
+    },[data])    
+
+    const onClickCoverDown = useCallback((e) => {
+        CoverUp && dispatch({
+            type : COVER_POST,
+        })
+    },[CoverUp])
+
+
+    
 const flexDivMemo = useMemo(() => {
     return {
         display : 'flex'
@@ -203,32 +234,10 @@ const divEditContainerMemo = useMemo(() => {
     }
 })
 
-const searchHashtag = useCallback((tag) => () => {
-    dispatch({
-        type : HASHTAG_SEARCH_REQUEST,
-        data : {
-            name : encodeURIComponent(tag)
-        }
-    })
-    router.pathname.slice(1) && Router.replace('/')
-},[])
-
-    const onClickMyInfo = useCallback(() => {
-        dispatch({
-            type : COVER_POST,
-            id : data?.UserId
-        })
-    },[data])    
-
-    const onClickCoverDown = useCallback((e) => {
-        CoverUp && dispatch({
-            type : COVER_POST,
-        })
-    },[CoverUp])
 
     return (
         <MyLayout>
-           {data ? <div onClick={onClickCoverDown}>
+           {data.id ? <div onClick={onClickCoverDown}>
             <Containertitle><h1>{data?.title}</h1></Containertitle>
             <DivContainer>
     <div style={flexDivMemo}>
@@ -247,12 +256,13 @@ const searchHashtag = useCallback((tag) => () => {
                 {data?.UserId === loginInfo?.id && <DivEdit>
                     <p onClick={() => Router.replace(`/write?PostId=${parseInt(data.id, 10)}`)}>수정</p>
                     <p>/</p>
-                    <p onClick={deletePost(data.id)}>삭제</p>
+                    <p onClick={deletePost(data?.id)}>삭제</p>
                 </DivEdit>}
             </div>
             <PostContent>
             <QuillStyleDiv dangerouslySetInnerHTML={{__html : data?.content}}/>
             </PostContent>
+            <CommentContainer post={data} user={loginInfo}/>
             </div> : (<BorderDiv><h1>로딩중...</h1></BorderDiv>)}
         </MyLayout>
     )

@@ -1,15 +1,11 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
-const passport = require('passport');
 const { Post, Image, Comment, Introduce, User, Hashtag } = require('../models');
 const router = express.Router()
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { removeHtmlAndShorten } = require('./sanitizeMiddle');
-const { Hash } = require('crypto');
 const { Op } = require('sequelize');
-const axios = require('axios');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -39,6 +35,51 @@ const upload = multer({
     }),
     limits: { fileSize: 20 * 1024 * 1024 }, // 20mb
 });
+
+router.post('/comment', async (req, res, next) => {
+    try {
+        if(!req.user) {
+            return res.status(403).send('로그인 후 이용 가능..')
+        }
+        const post = await Post.findOne({
+            where : { id  : req.body.postid }
+        })
+        if(!post) {
+            return res.status(403).send('존재하지 않는 게시글..')
+        }
+        await Comment.create({
+            content : req.body.comment,
+            UserId : req.user.id,
+            PostId : post.id
+        })
+
+        const fullPost = await Post.findOne({
+            where : {id : post.id},
+            include : [{
+                model : Image,
+            }, {
+                model : Comment,
+                Include : [{
+                    model : User,
+                    attributes : ['id', 'nickname'],
+                    include : [{
+                        model : Image
+                    }]
+                }]
+            }, {
+                model : User,
+                attributes : ['id', 'nickname']
+            }, {
+                model : Hashtag,
+            }]
+        })
+        res.status(201).json(fullPost)
+    } catch(err) {
+        console.error(err)
+        next(err)
+    }
+})
+
 
 router.post('/image', upload.array('image'), (req, res, next) => { // image 인풋에 uplaod 해준다. 사진 1개 - single , 사진 여러개 - array, 텍스트 - json
     console.log(req.files) // 여기에 업로드한 이미지들이 있음
@@ -83,15 +124,6 @@ router.post('/', removeHtmlAndShorten ,async (req, res, next) => {
             where : {id : post.id},
             include : [{
                 model : Image,
-            }, {
-                model : Comment,
-                Include : [{
-                    model : User,
-                    attributes : ['id', 'nickname'],
-                    include : [{
-                        model : Image
-                    }]
-                }]
             }, {
                 model : User,
                 attributes : ['id', 'nickname']
@@ -220,9 +252,14 @@ router.get('/:postId',  async (req, res, next) => {
                 model : Image,
             }, {
                 model : Comment,
-                Include : [{
+                // limit : 5,
+                include : [{
                     model : User,
-                    attributes : ['id', 'nickname']
+                    attributes : ['id', 'nickname'],
+                    include : [{
+                        model : Image,
+                        attributes : ['src'],
+                    }]
                 }]
             }, {
                 model : User,

@@ -21,16 +21,22 @@ const initialState = {
   hashtagSearchDone: false,
   hashtagSearchError: null,
 
+  submitCommentLoading : false,
+  submitCommentDone : false,
+  submitCommentError : null,
   
-  CoverUserId : null,
   PageNation: false,
-  InfinityScroll: true,
   toggleTag: false,
+  InfinityScroll: true,
+
+  CoverUserId : null,
   CoverUp : false,
   CoverUpLoading : false,
+  
   tagName: "",
   ImagePaths: [],
   PostsData: [],
+  onePost: {},
 };
 export const COVER_POST = 'COVER_POST';
 export const TOGGLE_TAG = "TOGGLE_TAG";
@@ -44,6 +50,10 @@ export const LOAD_POSTS_REQUEST = "LOAD_POSTS_REQUEST";
 export const LOAD_POSTS_SUCCESS = "LOAD_POSTS_SUCCESS";
 export const LOAD_POSTS_FAILURE = "LOAD_POSTS_FAILURE";
 
+export const LOAD_ONE_POST_REQUEST = "LOAD_ONE_POST_REQUEST";
+export const LOAD_ONE_POST_SUCCESS = "LOAD_ONE_POST_SUCCESS";
+export const LOAD_ONE_POST_FAILURE = "LOAD_ONE_POST_FAILURE";
+
 export const UPLOAD_IMAGES_SUCCESS = "UPLOAD_IMAGES_SUCCESS";
 export const UPLOAD_IMAGES_FAILURE = "UPLOAD_IMAGES_FAILURE";
 export const UPLOAD_IMAGES_REQUEST = "UPLOAD_IMAGES_REQUEST";
@@ -55,6 +65,10 @@ export const DELETE_POST_FAILURE = "DELETE_POST_FAILURE";
 export const HASHTAG_SEARCH_REQUEST = "HASHTAG_SEARCH_REQUEST";
 export const HASHTAG_SEARCH_SUCCESS = "HASHTAG_SEARCH_SUCCESS";
 export const HASHTAG_SEARCH_FAILURE = "HASHTAG_SEARCH_FAILURE";
+
+export const SUBMIT_COMMENT_REQUEST = "SUBMIT_COMMENT_REQUEST";
+export const SUBMIT_COMMENT_SUCCESS = "SUBMIT_COMMENT_SUCCESS";
+export const SUBMIT_COMMENT_FAILURE = "SUBMIT_COMMENT_FAILURE";
 
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
@@ -162,6 +176,40 @@ const reducer = (state = initialState, action) => {
         draft.hashtagSearchLoading = false;
         draft.hashtagSearchDone = true;
         draft.hashtagSearchError = action.error;
+        break;
+
+      case SUBMIT_COMMENT_REQUEST:
+        draft.submitCommentLoading = true;
+        draft.submitCommentDone = false;
+        draft.submitCommentFailure = null;
+        break;
+      case SUBMIT_COMMENT_SUCCESS:
+        draft.submitCommentLoading = false;
+        draft.submitCommentDone = true;
+        break;
+      case SUBMIT_COMMENT_FAILURE:
+        draft.submitCommentLoading = false;
+        draft.submitCommentDone = true;
+        draft.submitCommentFailure = action.error;
+        break;
+
+          
+      case LOAD_ONE_POST_REQUEST:
+        draft.loadPostsLoading = true;
+        draft.loadPostsDone = false;
+        draft.loadPostsFailure = null;
+        break;
+
+      case LOAD_ONE_POST_SUCCESS:
+        draft.loadPostsLoading = false;
+        draft.loadPostsDone = true;
+        draft.onePost = action.data;
+        break;
+
+      case LOAD_ONE_POST_SUCCESS:
+        draft.loadPostsLoading = false;
+        draft.loadPostsDone = true;
+        draft.loadPostsFailure = action.error;
         break;
 
       case TOGGLE_TAG:

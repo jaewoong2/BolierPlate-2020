@@ -147,7 +147,7 @@ margin-left: 5px;
 
 const PostCard = ({ postData : v, idx : i }) => {
   const dispatch = useDispatch();
-  const { CoverUp, PostsData, CoverUserId } = useSelector(state => state.post)
+  const { CoverUp, PostsData, CoverUserId, tagName } = useSelector(state => state.post)
   const { loginInfo } = useSelector((state) => state.user)
 
   const deletePost = useCallback((id) => () => {
@@ -160,13 +160,13 @@ const PostCard = ({ postData : v, idx : i }) => {
   },[])
 
   const searchHashtag = useCallback((tag) => () => {
-    dispatch({
+   tag !== tagName && dispatch({
         type : HASHTAG_SEARCH_REQUEST,
         data : {
             name : encodeURIComponent(tag)
         }
     })
-},[])
+},[tagName])
 
 const onClickUser = useCallback(() => {
   dispatch({

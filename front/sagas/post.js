@@ -1,6 +1,6 @@
 import { takeLatest, call, fork, all, put, throttle, delay } from "redux-saga/effects"
 import axios from 'axios';
-import { WRTIE_SUCCESS, WRTIE_FAILURE, WRTIE_REQUEST, LOAD_MYPOST_REQUEST, LOAD_MYPOST_SUCCESS, LOAD_MYPOST_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_SUCCESS, DELETE_POST_REQUEST, DELETE_POST_SUCCESS, DELETE_POST_FAILURE, HASHTAG_SEARCH_REQUEST, HASHTAG_SEARCH_SUCCESS, HASHTAG_SEARCH_FAILURE, LOAD_POSTS_REQUEST, LOAD_POSTS_SUCCESS, LOAD_POSTS_FAILURE, COVER_POST } from "../reducer/post";
+import { WRTIE_SUCCESS, WRTIE_FAILURE, WRTIE_REQUEST, LOAD_MYPOST_REQUEST, LOAD_MYPOST_SUCCESS, LOAD_MYPOST_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_SUCCESS, DELETE_POST_REQUEST, DELETE_POST_SUCCESS, DELETE_POST_FAILURE, HASHTAG_SEARCH_REQUEST, HASHTAG_SEARCH_SUCCESS, HASHTAG_SEARCH_FAILURE, LOAD_POSTS_REQUEST, LOAD_POSTS_SUCCESS, LOAD_POSTS_FAILURE, COVER_POST, SUBMIT_COMMENT_REQUEST, SUBMIT_COMMENT_SUCCESS, SUBMIT_COMMENT_FAILURE, LOAD_ONE_POST_REQUEST, LOAD_ONE_POST_SUCCESS, LOAD_ONE_POST_FAILURE } from "../reducer/post";
 
 
 // 글쓰기
@@ -148,6 +148,62 @@ function* watchHashtagSearch() {
 }
 
 
+function submitCommentAPI(data) {
+    return axios.post('/post/comment', data)
+}
+
+function* submitComment(action) {
+    try {  
+        const result = yield call(submitCommentAPI, action.data)
+        yield put({
+            type : SUBMIT_COMMENT_SUCCESS,
+            data : result.data,
+            tagName : decodeURIComponent(action.data.name)
+        })
+        
+    } catch(err) {
+        console.error(err)
+        yield put({
+            type : SUBMIT_COMMENT_FAILURE,
+            error : err.response.data
+        })
+    }
+}
+
+function* watchSubmitCommit() {
+    yield takeLatest(SUBMIT_COMMENT_REQUEST, submitComment);
+}
+
+
+function loadOnePostAPI(id) {
+    return axios.get(`/post/${id}`)
+}
+
+function* loadOnePost(action) {
+    try {  
+        const result = yield call(loadOnePostAPI, action.id)
+        yield put({
+            type : LOAD_ONE_POST_SUCCESS,
+            data : result.data,
+        })
+        
+    } catch(err) {
+        console.error(err)
+        yield put({
+            type : LOAD_ONE_POST_FAILURE,
+            error : err.response.data
+        })
+    }
+}
+
+function* watchLoadOnePost() {
+    yield takeLatest(LOAD_ONE_POST_REQUEST, loadOnePost);
+}
+
+
+
+
+
 function* watchCoverUp() {
     yield takeLatest(COVER_POST, function* (){
             yield put({
@@ -165,6 +221,8 @@ export default function* postSaga() {
         fork(watchPostImage),
         fork (watchDeletePost),
         fork(watchHashtagSearch),
-        fork(watchCoverUp)
+        fork(watchCoverUp),
+        fork(watchSubmitCommit),
+        fork(watchLoadOnePost),
     ])
 }

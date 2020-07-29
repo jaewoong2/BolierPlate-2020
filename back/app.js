@@ -12,6 +12,7 @@ const userRouter = require('./routes/user')
 const postRouter = require('./routes/post')
 const postsRouter = require('./routes/posts');
 const hashtagRouter = require('./routes/hashtag');
+const commentRouter = require('./routes/comment');
 // 모듈
 
 
@@ -55,6 +56,7 @@ app.use('/user', userRouter);
 app.use('/post', postRouter);
 app.use('/hashtag', hashtagRouter);
 app.use('/posts', postsRouter)
+app.use('/comment', commentRouter)
 
 
 
