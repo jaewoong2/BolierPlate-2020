@@ -13,6 +13,14 @@ import ModalForm from './ModalForm';
 import PageNation from './PageNation/PageNation';
 import Infomation from './Infomation/Infomation';
 
+const FullDiv = styled.div`
+background-color : #ffffff9d;
+width : 100vw;
+height : 100vh;
+z-index : 4;
+position : fixed;
+
+`
 const EditBtn = styled(StarFilled)`
 /* border-radius : 50%;
   width : 40px;
@@ -136,6 +144,7 @@ const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
 
     return (
       <>
+      {CoverUp && <FullDiv onClick={clickCoverUp}/> }
     <RowStyled onClick={clickCoverUp} justify="space-between" align="middle">
       <Col xs={24} md={3}  span={4}>
       </Col>

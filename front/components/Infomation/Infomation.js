@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import InfomationContnet from './InfomationContnet'
 import { COVER_POST } from '../../reducer/post'
 
+
 const StyledDivForWrapperFlex = styled(Row)`
         width : 100%;
         height : 0%;
@@ -14,6 +15,7 @@ const StyledDivForWrapperFlex = styled(Row)`
         align-items : flex-end;
         background-color : yellow;
         transition : height 0.4s ease-in;
+       
     `
 const StyledDivForContent = styled(Col)`
     display : flex;
@@ -25,10 +27,12 @@ const StyledDivForContent = styled(Col)`
     background-color : #ffffffff;
     border : 0.1px solid #2622eed8;
     border-bottom : 0;
-    box-shadow : 4px 4px 10px #777;
+    box-shadow : -2px -2px 7px #777, 2px 2px 2px #777; 
     border-radius : 50px 50px 0px 0px;
-    z-index : 1;
+    z-index : 5;
     transition : height 0.4s ease-in;
+
+
 `
 
 
@@ -55,11 +59,13 @@ const Infomation = () => {
     
     
     return (
+        <>
         <StyledDivForWrapperFlex>
            <StyledDivForContent style={normal} xs={20} md={16}>
             {CoverUp && CoverUserId &&<InfomationContnet />}
             </StyledDivForContent>
         </StyledDivForWrapperFlex>
+            </>
     )
 }
 

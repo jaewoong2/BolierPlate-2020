@@ -33,6 +33,12 @@ const StyledAvartar = styled(Avatar)`
     &:hover {
         cursor : pointer;
     }
+
+    img {
+        &:hover {
+            width : 10%;
+        }
+    }
 `
 
 const StyleDiv = styled.div`

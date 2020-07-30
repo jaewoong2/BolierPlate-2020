@@ -119,8 +119,13 @@ const PostContent = styled.div`
 const DivWrapper = styled.div`
     display : flex;
     justify-content : space-between;
-    align-items : center;
+    /* align-items : center; */
 
+    .heart {
+      margin-right : 3%;
+      font-size : 16px;
+      cursor : pointer;
+    }
     span {
       color : #686767;
       font-style : italic;
@@ -147,17 +152,17 @@ margin-left: 5px;
 
 const PostCard = ({ postData : v, idx : i }) => {
   const dispatch = useDispatch();
-  const { CoverUp, PostsData, CoverUserId, tagName } = useSelector(state => state.post)
+  const { CoverUp, PostsData, CoverUserId, tagName, deletePostLoading } = useSelector(state => state.post)
   const { loginInfo } = useSelector((state) => state.user)
 
   const deletePost = useCallback((id) => () => {
-    dispatch({
+    !deletePostLoading && dispatch({
       type : DELETE_POST_REQUEST,
       data : {
         id
       }
     })
-  },[])
+  },[deletePostLoading])
 
   const searchHashtag = useCallback((tag) => () => {
    tag !== tagName && dispatch({
@@ -200,7 +205,11 @@ if(!v && !i) {
         <PostViewerBlock>
           <PostHead>
               <DivWrapper>
-            <Link href={`/page/${v?.id}`}><a><h1 className="title"><span className="number">{i + 1} .</span>{v?.title}</h1></a></Link>
+            <Link href={`/page/${v?.id}`}>
+              <a><h1 className="title">
+                <span className="number">{i + 1} .</span>{v?.title}
+                </h1></a></Link>
+                <HeartTwoTone className="heart" />
               </DivWrapper>
             <SubInfo>
             <span onClick={onClickUser}>

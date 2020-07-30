@@ -90,6 +90,7 @@ const InfomationContnet = () => {
       </Col>
       <InfomationUserPost User={data}/>
     </Col>
+    <div className="full"/>
     </Col> 
   );
 };

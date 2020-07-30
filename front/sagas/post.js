@@ -1,6 +1,6 @@
 import { takeLatest, call, fork, all, put, throttle, delay } from "redux-saga/effects"
 import axios from 'axios';
-import { WRTIE_SUCCESS, WRTIE_FAILURE, WRTIE_REQUEST, LOAD_MYPOST_REQUEST, LOAD_MYPOST_SUCCESS, LOAD_MYPOST_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_SUCCESS, DELETE_POST_REQUEST, DELETE_POST_SUCCESS, DELETE_POST_FAILURE, HASHTAG_SEARCH_REQUEST, HASHTAG_SEARCH_SUCCESS, HASHTAG_SEARCH_FAILURE, LOAD_POSTS_REQUEST, LOAD_POSTS_SUCCESS, LOAD_POSTS_FAILURE, COVER_POST, SUBMIT_COMMENT_REQUEST, SUBMIT_COMMENT_SUCCESS, SUBMIT_COMMENT_FAILURE, LOAD_ONE_POST_REQUEST, LOAD_ONE_POST_SUCCESS, LOAD_ONE_POST_FAILURE } from "../reducer/post";
+import { WRTIE_SUCCESS, WRTIE_FAILURE, WRTIE_REQUEST, LOAD_MYPOST_REQUEST, LOAD_MYPOST_SUCCESS, LOAD_MYPOST_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_SUCCESS, DELETE_POST_REQUEST, DELETE_POST_SUCCESS, DELETE_POST_FAILURE, HASHTAG_SEARCH_REQUEST, HASHTAG_SEARCH_SUCCESS, HASHTAG_SEARCH_FAILURE, LOAD_POSTS_REQUEST, LOAD_POSTS_SUCCESS, LOAD_POSTS_FAILURE, COVER_POST, SUBMIT_COMMENT_REQUEST, SUBMIT_COMMENT_SUCCESS, SUBMIT_COMMENT_FAILURE, LOAD_ONE_POST_REQUEST, LOAD_ONE_POST_SUCCESS, LOAD_ONE_POST_FAILURE, DELETE_COMMENT_REQUEST, DELETE_COMMENT_FAILURE, DELETE_COMMENT_SUCCESS } from "../reducer/post";
 
 
 // 글쓰기
@@ -13,20 +13,22 @@ function writeAPI(data) {
 }
 
 function* write(action) {
-    try {  
+    try {
+
         const result = yield call(writeAPI, action.data);
-
-        yield action.data.edit === false && put({
-            type : WRTIE_SUCCESS,
-            data : result.data,
-            edit : false,
-        })
-
-        yield action.data.edit && put({
-            type : WRTIE_SUCCESS,
-            data : result.data,
-            edit : true
-        })
+        if(action.data.edit) {
+            yield put({
+                type : WRTIE_SUCCESS,
+                data : result.data,
+                edit : true
+            })
+        } else {
+            yield put({
+                type : WRTIE_SUCCESS,
+                data : result.data,
+                edit : false,
+            })
+        }
         
     } catch(err) {
         console.error(err)
@@ -38,7 +40,7 @@ function* write(action) {
 }
 
 function* watchWrite() {
-    yield throttle(2000, WRTIE_REQUEST, write);
+    yield takeLatest(WRTIE_REQUEST, write);
 }
 
 // 로드 포스츠
@@ -158,7 +160,6 @@ function* submitComment(action) {
         yield put({
             type : SUBMIT_COMMENT_SUCCESS,
             data : result.data,
-            tagName : decodeURIComponent(action.data.name)
         })
         
     } catch(err) {
@@ -201,6 +202,31 @@ function* watchLoadOnePost() {
 }
 
 
+function deleteCommentAPI(data) {
+    return axios.delete(`/comment/${data}`)
+}
+
+function* deleteComment(action) {
+    try {  
+        const result = yield call(deleteCommentAPI, action.id)
+        yield put({
+            type : DELETE_COMMENT_SUCCESS,
+            data : result.data,
+        })
+        
+    } catch(err) {
+        console.error(err)
+        yield put({
+            type : DELETE_COMMENT_FAILURE,
+            error : err.response.data
+        })
+    }
+}
+
+function* watchDeleteCommit() {
+    yield takeLatest(DELETE_COMMENT_REQUEST, deleteComment);
+}
+
 
 
 
@@ -224,5 +250,6 @@ export default function* postSaga() {
         fork(watchCoverUp),
         fork(watchSubmitCommit),
         fork(watchLoadOnePost),
+        fork(watchDeleteCommit),
     ])
 }

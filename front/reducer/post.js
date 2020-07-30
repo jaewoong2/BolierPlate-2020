@@ -25,6 +25,10 @@ const initialState = {
   submitCommentDone : false,
   submitCommentError : null,
   
+  deleteCommentLoading : false,
+  deleteCommentDone : false,
+  deleteCommentError : null,
+  
   PageNation: false,
   toggleTag: false,
   InfinityScroll: true,
@@ -37,10 +41,12 @@ const initialState = {
   ImagePaths: [],
   PostsData: [],
   onePost: {},
+  RecommentInfo : {},
 };
 export const COVER_POST = 'COVER_POST';
 export const TOGGLE_TAG = "TOGGLE_TAG";
 export const PAGE_NATION_TOGGLE = "PAGE_NATION_TOGGLE";
+export const RECOMMENT_TOGGLE = 'RECOMMENT_TOGGLE';
 
 export const WRTIE_REQUEST = "WRTIE_REQUEST";
 export const WRTIE_SUCCESS = "WRTIE_SUCCESS";
@@ -69,6 +75,10 @@ export const HASHTAG_SEARCH_FAILURE = "HASHTAG_SEARCH_FAILURE";
 export const SUBMIT_COMMENT_REQUEST = "SUBMIT_COMMENT_REQUEST";
 export const SUBMIT_COMMENT_SUCCESS = "SUBMIT_COMMENT_SUCCESS";
 export const SUBMIT_COMMENT_FAILURE = "SUBMIT_COMMENT_FAILURE";
+
+export const DELETE_COMMENT_REQUEST = "DELETE_COMMENT_REQUEST";
+export const DELETE_COMMENT_SUCCESS = "DELETE_COMMENT_SUCCESS";
+export const DELETE_COMMENT_FAILURE = "DELETE_COMMENT_FAILURE";
 
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
@@ -178,21 +188,21 @@ const reducer = (state = initialState, action) => {
         draft.hashtagSearchError = action.error;
         break;
 
-      case SUBMIT_COMMENT_REQUEST:
-        draft.submitCommentLoading = true;
-        draft.submitCommentDone = false;
-        draft.submitCommentFailure = null;
-        break;
-      case SUBMIT_COMMENT_SUCCESS:
-        draft.submitCommentLoading = false;
-        draft.submitCommentDone = true;
-        break;
-      case SUBMIT_COMMENT_FAILURE:
-        draft.submitCommentLoading = false;
-        draft.submitCommentDone = true;
-        draft.submitCommentFailure = action.error;
-        break;
-
+        case SUBMIT_COMMENT_REQUEST:
+          draft.submitCommentLoading = true;
+          draft.submitCommentDone = false;
+          draft.submitCommentFailure = null;
+          break;
+        case SUBMIT_COMMENT_SUCCESS:
+          draft.submitCommentLoading = false;
+          draft.submitCommentDone = true;
+          break;
+        case SUBMIT_COMMENT_FAILURE:
+          draft.submitCommentLoading = false;
+          draft.submitCommentDone = true;
+          draft.submitCommentFailure = action.error;
+          break;
+  
           
       case LOAD_ONE_POST_REQUEST:
         draft.loadPostsLoading = true;
@@ -212,13 +222,36 @@ const reducer = (state = initialState, action) => {
         draft.loadPostsFailure = action.error;
         break;
 
+        case DELETE_COMMENT_REQUEST:
+          draft.deleteCommentLoading = true;
+          draft.deleteCommentDone = false;
+          draft.deleteCommentFailure = null;
+          break;
+        case DELETE_COMMENT_SUCCESS:
+          draft.deleteCommentLoading = false;
+          draft.deleteCommentDone = true;
+          break;
+        case DELETE_COMMENT_FAILURE:
+          draft.deleteCommentLoading = false;
+          draft.deleteCommentDone = true;
+          draft.deleteCommentFailure = action.error;
+          break;
+  
+
+
+
+
+
+
+
+        
       case TOGGLE_TAG:
         draft.toggleTag = !draft.toggleTag;
         break;
 
       case PAGE_NATION_TOGGLE:
         draft.PageNation = !draft.PageNation;
-        draft.InfinityScroll = !draft.InfinityScroll;
+        draft.InfinityScroll = !draft.PageNation;
         break;
         
         case COVER_POST : 
@@ -230,7 +263,8 @@ const reducer = (state = initialState, action) => {
         draft.CoverUpLoading = false;
         break;
 
-
+      case RECOMMENT_TOGGLE : 
+        draft.RecommentInfo = action.data.comment;
         default:
           break;
     }

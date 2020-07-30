@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import CommentInput from './CommentInput'
 import styled from 'styled-components'
 import moment from 'moment';
 import useSWR from 'swr';
 import axios from 'axios';
 import CommentPagination from './CommentPagination';
+import { useSelector, useDispatch } from 'react-redux';
+import { COVER_POST } from '../../reducer/post';
+import CommentCotent from './CommentCotent';
 const StyledDivWrapper = styled.div`
     
     display : flex;
@@ -15,9 +18,14 @@ const StyledDivWrapper = styled.div`
         height : 24px;
         border-radius : 50%;
         margin-right : 10px;
+        cursor : pointer;
     }
 
-    span {
+    span { 
+        cursor : pointer;
+    }
+
+    .delete {
         font-size : 10px;
         color : #c95757c0;
         cursor : pointer;
@@ -27,46 +35,67 @@ const StyledDivWrapper = styled.div`
     .commentWrapper {
         width : 75%;
     }
+    
+    .comments {
+        .imgspan{
+            border-left : 4px solid #888;
+            padding-left : 4px;
+        }
 
-    .commentDiv {
-        width : 100%;
+        .commentDiv {
+            width : 100%;
+            padding-left : 4px;
+            border-left : 4px solid #888;
+        }
+        .day {
+            width : 100%;
+            padding-bottom : 3px;
+            margin-bottom : 11px;
+            /* border-bottom : 1px solid black;  */
+            .down {
+                font-size : 10px;
+                color : #212bb8c2;
+            }
+            .recommentbtn {
+                margin-left : 5px;
+                font-size : 12px;
+                color : #777;
+                cursor : pointer;
+            }
+        }
+        
+        .reply {
+            background-color : #f1a1a183;
+            border-radius : 10px 10px 0px 0px;
+        }
+        
+        .replycontent {
+            width : 95%;
+            margin-left : 5%;
+        }
     }
-    .day {
-        width : 100%;
-        border-bottom : 1px solid black; 
-        padding-bottom : 3px;
-        margin-bottom : 11px;
-    }
+    
+
 `
-// const fetcher = (url) => axios.get(url, {withCredentials  : true }).then(res => res.data);
 
 const CommentContainer = ({user, post}) => {
     const [number, setNumber] = useState(0);
-    // const { data : commentData, error : commentError } = useSWR(`http://localhost:3055/comment/${post?.id}?lastId=${number}`, fetcher);
     
     return (
-        <>
+        <div>
         <CommentPagination comment={post.Comments} number={number} setNumber={setNumber}/>
+        {user.id && <CommentInput user={user} postid={post?.id}/>}
         <StyledDivWrapper>
             <div className="commentWrapper">
-            {post.Comments?.map((v, i) => (5 * number <= i && 5 * (number + 1) > i) && (
-                <>
-                <div>
-                    <img src={`http://localhost:3055/${v?.User?.Images[0]?.src}`} />
-                    {v?.User?.nickname}
-                    {v?.User?.id === user.id && <span>{' 삭제'}</span>}
+            {post.Comments?.map((v, i) => (5 * number <= i && 5 * (number + 1) > i) && !v.CommentId && (
+                <div className="comments">
+              <CommentCotent comment={v} user={user}/>
                 </div>
-            <div className="commentDiv">
-                <pre className="comment">- {v.content}</pre>
-            </div>
-            <div className="day">{moment(post?.createdAt).format('YYYY.MM.DD')}</div>
-            </>
             )
         )}
             </div>
         </StyledDivWrapper>
-            {user.id && <CommentInput user={user} postid={post?.id}/>}
-        </>
+        </div>
     )
 }
 

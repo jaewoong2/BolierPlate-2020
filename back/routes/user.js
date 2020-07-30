@@ -215,7 +215,7 @@ router.post('/login', (req, res, next) => {
 });
 
 
-router.get('/:userid', async (req, res, next) => {
+router.get('/:userid', async (req, res, next) => { // 프로필 정보창 받아오기
     try {
         const userid = parseInt(req.params.userid, 10);
         if(!userid) {
@@ -230,11 +230,13 @@ router.get('/:userid', async (req, res, next) => {
         const fullUser = await User.findOne({
             where : { id : user.id },
             attributes : ['email', 'nickname', 'id'],
+            order : [[ { model : Post }, 'createdAt', "DESC"]],
             include : [{
-                model : Post
+                model : Post,
             }, {
                 model : Image,
-                order : [['DESC']]
+                order : [['DESC']],
+                attributes : ['src']
             }, {
                 model : Comment
             }, {

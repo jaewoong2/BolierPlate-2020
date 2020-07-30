@@ -138,7 +138,7 @@ const page = () => {
     const router = useRouter();
     const { id } = router.query;
     const { loginInfo } = useSelector((state) => state.user);
-    const { CoverUp, onePost : data, submitCommentDone, submitCommentLoding } = useSelector((state) => state.post);
+    const { CoverUp, onePost : data, submitCommentDone, submitCommentLoding, deleteCommentDone, deleteCommentLoding } = useSelector((state) => state.post);
 
 
     useEffect(() => {
@@ -152,7 +152,7 @@ const page = () => {
             type : LOAD_ONE_POST_REQUEST,
             id 
         })
-    },[submitCommentDone && !submitCommentLoding])
+    },[submitCommentDone && !submitCommentLoding, deleteCommentDone && !deleteCommentLoding])
 
     useEffect(() => {
         if(data === null) {

@@ -1,10 +1,24 @@
 import React, { useEffect, useCallback, useState } from 'react'
-import { Input, Button, Form } from 'antd'
+import { Input, Button, Form, Typography } from 'antd'
 import styled from 'styled-components'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import UseInput from '../../Hooks/UseInput'
-import { COVER_POST, SUBMIT_COMMENT_REQUEST } from '../../reducer/post'
+import { COVER_POST, SUBMIT_COMMENT_REQUEST, RECOMMENT_TOGGLE } from '../../reducer/post'
 
+const StyledDivForReplyTo = styled.div`
+    margin-left : 10vw;
+    
+    .cancel {
+        margin-left : 5px;
+        color : #f1a1a1e0;
+        cursor : pointer;
+    }
+`
+const StyledTypography = styled(Typography.Text)`
+    &:hover {
+        color : #3009ff;
+    }
+`
 
 const StyledDivForForm = styled.div`
     width : 70%;
@@ -72,19 +86,29 @@ const CommetTextArea = styled(Input.TextArea)`
 
 
 const CommentInput = ({user, postid}) => {
+    const { RecommentInfo } = useSelector(state => state.post);
     const [commentValue, setCommentValue, onChangeCommentValue] = UseInput('')
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        RecommentInfo?.User?.nickname && setCommentValue();
+    },[RecommentInfo])
 
     const onSubmitComment =  useCallback(() => {
         dispatch({
             type : SUBMIT_COMMENT_REQUEST,
             data : {
                 postid : postid,
-                comment : commentValue
+                commentid : RecommentInfo?.id,
+                comment : commentValue,
             },
         })
         setCommentValue('');
-    },[commentValue, user])
+        RecommentInfo && dispatch({
+            type : RECOMMENT_TOGGLE,
+            data : {comment : null},
+        })
+    },[commentValue, user, RecommentInfo])
 
     const onClickCoverUp = useCallback(() => {
         dispatch({
@@ -92,14 +116,22 @@ const CommentInput = ({user, postid}) => {
             id : user.id
         })
     })
+    
+    const onClickCancelBtn = useCallback(() => {
+        RecommentInfo && dispatch({
+            type : RECOMMENT_TOGGLE,
+            data : {comment : null},
+        })
+    },[RecommentInfo])
 
     return (
         <>
+        <StyledDivForReplyTo>
+        {RecommentInfo?.User?.nickname && <StyledTypography code>@{RecommentInfo?.User?.nickname}<sapn onClick={onClickCancelBtn} className="cancel">X</sapn></StyledTypography>}
+        </StyledDivForReplyTo>
         <StyledDivForWrapper>
             <div>
-    {user?.Images ? <img onClick={onClickCoverUp} src={`http://localhost:3055/${user?.Images[0]?.src}`}/> :
-        <img/>
-    }
+    {user?.Images ? <img onClick={onClickCoverUp} src={`http://localhost:3055/${user?.Images[0]?.src}`}/> :<img/>}
             </div>
             <StyledDivForForm>
             <CommetTextArea className="form" autoSize={{maxRows : 1}} value={commentValue} onChange={onChangeCommentValue} />

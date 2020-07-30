@@ -39,12 +39,21 @@ const StyledDivForContainer = styled(Col)`
             justify-content : space-between;
             b {
                 padding-left : 10px;
+                margin-right : 10px;
                 border-left : 2px solid #1d7dccd3;
             }
             .innerHtml {
                 overflow : hidden;
             }
         }
+        
+        .innerHtml {
+            overflow : hidden;
+            white-space : nowrap;
+            text-overflow : ellipsis;
+        }
+
+
     }
 `
 
@@ -113,13 +122,11 @@ const InfomationUserPost = ({ User }) => {
         {clicked === '글' && User?.Posts?.map((v, i) =>
         (<Col xs={24} className="contentWrapper">
         <div className="title">
-            <Tooltip mouseEnterDelay={0.5} mouseLeaveDelay={0.1} placement="topLeft" title={v?.title}>
                 <Link href={`/page/${v?.id}`}><a>{i + 1}. {v?.title}</a></Link>
-                </Tooltip>
                 </div>
                 <div className="innerHtml" dangerouslySetInnerHTML={{__html : v?.content.length > 20 ? v?.content?.slice(0, 19) + '...' : v?.content}} />   
                 <div>
-                <b>{moment(v?.createdAt).format('MM월DD일')}</b>             
+                <b>{moment(v?.createdAt).format('MM.DD.')}</b>             
                 </div>
             </Col>
                 ))}

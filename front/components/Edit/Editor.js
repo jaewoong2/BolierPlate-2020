@@ -246,6 +246,12 @@ const Editor = ({ data }) => {
     })
     
     const onClickWriteBtn = useCallback(() => {
+      if(title.trim() === "") {
+        return message.warn('제목을 작성 해주세요..')
+      }
+      if(content.replace(/(<([^>]+)>)/ig,"").trim() === ""){
+        return message.warn('내용을 작성 해주세요..')
+      }
       if(!data) {
         dispatch({
           type : WRTIE_REQUEST,

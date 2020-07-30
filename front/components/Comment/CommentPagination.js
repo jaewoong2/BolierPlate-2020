@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
 import Link from 'next/link'
+import { useSelector } from 'react-redux'
 
 const StyledDivForFlex = styled.div`
     display : flex;
@@ -42,15 +43,22 @@ const StyledRightOutlined = styled(RightOutlined)`
 `
 
 const CommentPagination = ({comment, number, setNumber}) => {
+    const { submitCommentLoading, submitCommentDone } = useSelector(state => state.post)
+    const comments = comment.map(v => v.CommentId ? false : v).filter(v => v !== false);
 
     const onClickRightBtn = useCallback(() => {
-        5 * (number + 1) < comment.length  && setNumber(prev => prev + 1)
+        5 * (number + 1) < comments.length  && setNumber(prev => prev + 1)
+        // 총 댓글의 수가 현재 보고 있는 수 * 5보다 크면 안넘어감
     },[number])
 
     const onClickLeftBtn = useCallback(() => {
         number > 0 &&
         setNumber(prev => prev - 1)
     },[number])
+
+    useEffect(() => {
+         !submitCommentLoading && submitCommentDone && setNumber(Math.ceil(comments.length / 5) - 1)
+    },[submitCommentLoading, submitCommentDone, comment])
 
 
     return (

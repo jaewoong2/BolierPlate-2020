@@ -50,9 +50,10 @@ router.post('/comment', async (req, res, next) => {
         await Comment.create({
             content : req.body.comment,
             UserId : req.user.id,
-            PostId : post.id
+            PostId : post.id,
+            CommentId : req.body.commentid,
         })
-
+        
         const fullPost = await Post.findOne({
             where : {id : post.id},
             include : [{
@@ -65,6 +66,8 @@ router.post('/comment', async (req, res, next) => {
                     include : [{
                         model : Image
                     }]
+                }, {
+                    model : Comment
                 }]
             }, {
                 model : User,

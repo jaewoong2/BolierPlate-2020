@@ -11,14 +11,26 @@ import UseInput from "../Hooks/UseInput";
 import { HASHTAG_SEARCH_REQUEST, LOAD_POSTS_REQUEST, COVER_POST } from "../reducer/post";
 import Infomation from "./Infomation/Infomation";
 
+const StyledImageForMenu = styled.img`
+    width : 35px;
+    height : 35px;
+    border-radius : 50%;
+
+  &:hover {
+    transform : rotate(-45deg);
+  }
+transition : transform 0.3s;
+
+`
+
 const StyledDivForLogo = styled.div`
   width : 40px;
   
   img {
-    width : 100%;
     &:hover {
-      transform : rotate(45deg);
-    }
+  transform : rotate(45deg);
+}
+    width : 100%;
     transition : transform 0.3s;
   }
  
@@ -124,6 +136,10 @@ const MenuStyleMemo = useMemo(() => {
 
 const SubMenuFloatRigth = useMemo(() => {
   return {
+    // width : '40px',
+    // paddingLeft : '0px',
+    // paddingRight : '0px',
+    padding : 0,
     float : 'right'
   }
 },[])
@@ -155,7 +171,7 @@ const FullDIv = useMemo(() => {
             </div>
           </Popover>
       </StyledMenuForInputSearch>
-      <SubMenu style={SubMenuFloatRigth}  icon={<MenuOutlined />}>
+      <SubMenu style={SubMenuFloatRigth} icon={loginInfo?.Images ? <StyledImageForMenu src={`http://localhost:3055/${loginInfo?.Images[0]?.src}`}/> : <MenuOutlined /> }>
         {!loginInfo?.email ? (
       <Menu.ItemGroup title={null}>
             <Menu.Item onClick={onModalLogin} key="setting:1">로그인</Menu.Item>

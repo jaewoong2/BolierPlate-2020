@@ -62,7 +62,7 @@ const Home = () => {
   },[PostsData,
     tagName,
     InfinityScroll,
-    loadPostsLoading])
+    loadPostsLoading, PageNation])
 
   return (
     <MyLayout onScrollHandler={scrollHandler}>
