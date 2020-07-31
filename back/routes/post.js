@@ -36,6 +36,110 @@ const upload = multer({
     limits: { fileSize: 20 * 1024 * 1024 }, // 20mb
 });
 
+router.delete('/unlike/:postid', async(req, res, next) => {
+    try {
+        const postid = req.params.postid;
+        const post = await Post.findOne({
+            where : { id : postid } 
+        });
+        if(!post) {
+            return res.status(403).send('존재 하지 않는 게시글...')
+        }
+         await post.removeLikers(req.user.id);
+         const fullpost = await Post.findOne({
+            where : {id : post.id},
+            include : [{
+                model : Image,
+            }, {
+                model : Comment,
+                include : [{
+                    model : User,
+                    attributes : ['id', 'nickname'],
+                    include : [{
+                        model : Image
+                    }]
+                }, {
+                    model : Comment
+                }]
+            }, {
+                model : User,
+                attributes : ['id', 'nickname'],
+                include : [{
+                    model : Image,
+                    attributes : ['src']
+                }]
+            }, {
+                model : Hashtag,
+            }, {
+                model : User,
+                attributes : ['id', 'nickname'],
+                as : 'Likers',
+                include : [{
+                    model : Image,
+                    attributes : ['src']
+                }]
+            }]
+        })
+        res.status(201).json(fullpost)
+    } catch(err) {
+        console(err)
+        next(err)
+    }
+})
+
+router.patch('/like/:postid', async(req, res, next) => {
+    try {
+        const postid = req.params.postid;
+        const post = await Post.findOne({
+            where : { id : postid }
+        });
+        if(!post) {
+            return res.status(403).send('존재 하지 않는 게시글...')
+        }
+        await post.addLikers(req.user.id);
+        
+        const fullpost = await Post.findOne({
+            where : {id : post.id},
+            include : [{
+                model : Image,
+            }, {
+                model : Comment,
+                include : [{
+                    model : User,
+                    attributes : ['id', 'nickname'],
+                    include : [{
+                        model : Image
+                    }]
+                }, {
+                    model : Comment
+                }]
+            }, {
+                model : User,
+                attributes : ['id', 'nickname'],
+                include : [{
+                    model : Image,
+                    attributes : ['src']
+                }]
+            }, {
+                model : Hashtag,
+            }, {
+                model : User,
+                attributes : ['id', 'nickname'],
+                as : 'Likers',
+                include : [{
+                    model : Image,
+                    attributes : ['src']
+                }]
+            }]
+        })
+        res.status(201).json(fullpost)
+    } catch(err) {
+        console.error(err)
+        next(err)
+    }
+})
+
+
 router.post('/comment', async (req, res, next) => {
     try {
         if(!req.user) {
@@ -54,13 +158,13 @@ router.post('/comment', async (req, res, next) => {
             CommentId : req.body.commentid,
         })
         
-        const fullPost = await Post.findOne({
+        const fullpost = await Post.findOne({
             where : {id : post.id},
             include : [{
                 model : Image,
             }, {
                 model : Comment,
-                Include : [{
+                include : [{
                     model : User,
                     attributes : ['id', 'nickname'],
                     include : [{
@@ -71,12 +175,24 @@ router.post('/comment', async (req, res, next) => {
                 }]
             }, {
                 model : User,
-                attributes : ['id', 'nickname']
+                attributes : ['id', 'nickname'],
+                include : [{
+                    model : Image,
+                    attributes : ['src']
+                }]
             }, {
                 model : Hashtag,
+            }, {
+                model : User,
+                attributes : ['id', 'nickname'],
+                as : 'Likers',
+                include : [{
+                    model : Image,
+                    attributes : ['src']
+                }]
             }]
         })
-        res.status(201).json(fullPost)
+        res.status(201).json(fullpost)
     } catch(err) {
         console.error(err)
         next(err)
@@ -187,24 +303,39 @@ router.patch('/', removeHtmlAndShorten ,async (req, res, next) => {
             await post.addHashtags(hashtags.map(v => v[0]))
     }
 
-        const fullPost = await Post.findOne({
-            where : {id :  req.body.id  },
+    const fullpost = await Post.findOne({
+        where : {id : post.id},
+        include : [{
+            model : Comment,
             include : [{
-                model : Image,
-            }, {
-                model : Comment,
-                Include : [{
-                    model : User,
-                    attributes : ['id', 'nickname']
+                model : User,
+                attributes : ['id', 'nickname'],
+                include : [{
+                    model : Image
                 }]
             }, {
-                model : User,
-                attributes : ['id', 'nickname']
-            }, {
-                model : Hashtag,
+                model : Comment
             }]
-        })
-        res.status(201).json(fullPost)
+        }, {
+            model : User,
+            attributes : ['id', 'nickname'],
+            include : [{
+                model : Image,
+                attributes : ['src']
+            }]
+        }, {
+            model : Hashtag,
+        }, {
+            model : User,
+            attributes : ['id', 'nickname'],
+            as : 'Likers',
+            include : [{
+                model : Image,
+                attributes : ['src']
+            }]
+        }]
+    })
+    res.status(201).json(fullpost)
     } catch(err) {
         console.error(err)
         next(err)
@@ -231,6 +362,14 @@ router.get('/', removeHtmlAndShorten, async (req, res, next) => {
             }, {
                 model : User,
                 attributes : ['id', 'nickname'],
+                include : [{
+                    model : Image,
+                    attributes : ['src']
+                }]
+            }, {
+                model : User,
+                attributes : ['id', 'nickname'],
+                as : 'Likers',
                 include : [{
                     model : Image,
                     attributes : ['src']
@@ -267,6 +406,14 @@ router.get('/:postId',  async (req, res, next) => {
             }, {
                 model : User,
                 attributes : ['id', 'nickname'],
+                include : [{
+                    model : Image,
+                    attributes : ['src']
+                }]
+            }, {
+                model : User,
+                attributes : ['id', 'nickname'],
+                as : 'Likers',
                 include : [{
                     model : Image,
                     attributes : ['src']
@@ -345,6 +492,14 @@ router.get('/hashtag/:tagname', async (req, res, next) => {
             }, {
                 model : User,
                 attributes : ['id', 'nickname'],
+                include : [{
+                    model : Image,
+                    attributes : ['src']
+                }]
+            }, {
+                model : User,
+                attributes : ['id', 'nickname'],
+                as : 'Likers',
                 include : [{
                     model : Image,
                     attributes : ['src']

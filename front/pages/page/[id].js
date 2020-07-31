@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo } from 'react'
+import React, { useEffect, useCallback, useMemo, useState } from 'react'
 import Router, { useRouter } from 'next/router';
 import useSWR from 'swr';
 import axios from 'axios';
@@ -8,11 +8,30 @@ import 'moment/locale/ko'
 import styled from 'styled-components';
 import { message, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST, COVER_POST, LOAD_ONE_POST_REQUEST } from '../../reducer/post';
+import { DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST, COVER_POST, LOAD_ONE_POST_REQUEST, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST } from '../../reducer/post';
 import { LOAD_MYINFO_REQUEST } from '../../reducer/user';
 import { HeartTwoTone, HeartOutlined } from '@ant-design/icons';
 import CommentInput from '../../components/Comment/CommentInput';
 import CommentContainer from '../../components/Comment/CommentContainer';
+
+
+const LikeDiv = styled.div`
+    display : flex;
+    margin : 10px 0px 0px 4vw;
+    margin-right : 5vw;
+
+    .heart {    
+        display : flex;
+        align-items : center;
+        font-size : 20px;
+    }    
+
+    span {
+        margin-right : 10px;
+        font-size : 18px;
+        font-style : italic;
+    }
+`
 
 const Containertitle = styled.div`
     display : flex;
@@ -140,6 +159,11 @@ const page = () => {
     const { loginInfo } = useSelector((state) => state.user);
     const { CoverUp, onePost : data, submitCommentDone, submitCommentLoding, deleteCommentDone, deleteCommentLoding } = useSelector((state) => state.post);
 
+    const [liker, setLiker] = useState({})
+
+    useEffect(() => {
+        setLiker(data?.Likers?.map(liker => liker?.id === loginInfo?.id ? liker : false).filter(v => v !== false)[0]);
+    },[data])
 
     useEffect(() => {
         dispatch({
@@ -193,6 +217,21 @@ const page = () => {
         })
     },[CoverUp])
 
+    const onClickLike = useCallback(() => {
+        if(!loginInfo.id) {
+          return message.warn('로그인 후 이용 가능합니다')
+        } else {
+          !liker && dispatch({
+            type : LIKE_POST_REQUEST,
+            id : data.id
+          });
+          liker && dispatch({
+            type : UNLIKE_POST_REQUEST,
+            id : data.id
+          })
+        }
+      },[liker, data, loginInfo]);
+
 
     
 const flexDivMemo = useMemo(() => {
@@ -235,6 +274,7 @@ const divEditContainerMemo = useMemo(() => {
 })
 
 
+
     return (
         <MyLayout>
            {data.id ? <div onClick={onClickCoverDown}>
@@ -253,11 +293,16 @@ const divEditContainerMemo = useMemo(() => {
             <DivEditOne>
                 {data?.Hashtags?.map(v => <StyledTags onClick={searchHashtag(v.name)} keyboard>{v.name}</StyledTags>)}
             </DivEditOne>
-                {data?.UserId === loginInfo?.id && <DivEdit>
+                {data?.UserId === loginInfo?.id && 
+                <DivEdit>
                     <p onClick={() => Router.replace(`/write?PostId=${parseInt(data.id, 10)}`)}>수정</p>
                     <p>/</p>
                     <p onClick={deletePost(data?.id)}>삭제</p>
                 </DivEdit>}
+                <LikeDiv>
+                <HeartTwoTone onClick={onClickLike} className="heart" twoToneColor={liker?.id ? 'red' : 'gray'} />
+                <span>{data?.Likers?.length}</span>
+                </LikeDiv>
             </div>
             <PostContent>
             <QuillStyleDiv dangerouslySetInnerHTML={{__html : data?.content}}/>

@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { LOAD_MYINFO_REQUEST } from '../reducer/user';
-import { DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST, LOAD_POSTS_REQUEST, COVER_POST } from '../reducer/post';
-import React, { useEffect, useCallback } from 'react'
+import { DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST, LOAD_POSTS_REQUEST, COVER_POST, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST } from '../reducer/post';
+import React, { useEffect, useCallback, useState } from 'react'
 import styled from 'styled-components';
-import { Avatar, Dropdown, Menu, Typography } from 'antd';
+import { Avatar, Dropdown, Menu, Typography, message } from 'antd';
 import Link from 'next/link';
 import moment from 'moment';
 import 'moment/locale/ko'
@@ -122,7 +122,6 @@ const DivWrapper = styled.div`
     /* align-items : center; */
 
     .heart {
-      margin-right : 3%;
       font-size : 16px;
       cursor : pointer;
     }
@@ -142,6 +141,22 @@ const DivWrapper = styled.div`
       display : flex;
     }
     
+    .like {
+    display : flex;
+
+    .heart {    
+        display : flex;
+        align-items : center;
+        font-size : 15px;
+    }    
+
+    span {
+        margin-right : 10px;
+        font-size : 18px;
+        font-style : italic;
+    }
+    }
+    
 `
 
 const AvartarStyle = styled(Avatar)`
@@ -150,10 +165,15 @@ margin-left: 5px;
  overflow : hidden ;
 `
 
-const PostCard = ({ postData : v, idx : i }) => {
+const PostCard = ({ postData , idx : index }) => {
   const dispatch = useDispatch();
   const { CoverUp, PostsData, CoverUserId, tagName, deletePostLoading } = useSelector(state => state.post)
   const { loginInfo } = useSelector((state) => state.user)
+  const [Liker, setLiker] = useState({});
+
+  useEffect(() => {
+    setLiker(postData?.Likers?.map(liker => liker?.id === loginInfo?.id ? liker : false).filter(v => v !== false)[0]);
+  },[postData, loginInfo])
 
   const deletePost = useCallback((id) => () => {
     !deletePostLoading && dispatch({
@@ -176,11 +196,11 @@ const PostCard = ({ postData : v, idx : i }) => {
 const onClickUser = useCallback(() => {
   dispatch({
     type : COVER_POST,
-    id : v?.UserId
+    id : postData?.UserId
   })
-  CoverUp && v?.UserId !== CoverUserId && dispatch({
+  CoverUp && postData?.UserId !== CoverUserId && dispatch({
     type : COVER_POST,
-    id : v?.UserId
+    id : postData?.UserId
   })
 },[CoverUp, CoverUserId])
 
@@ -193,41 +213,59 @@ const onClickEmpty = useCallback((e) => {
   })
 },[CoverUp])
 
+const onClickLike = useCallback(() => {
+  if(!loginInfo.id) {
+    return message.warn('로그인 후 이용 가능합니다')
+  } else {
+    !Liker && dispatch({
+      type : LIKE_POST_REQUEST,
+      id : postData.id
+    });
+    Liker && dispatch({
+      type : UNLIKE_POST_REQUEST,
+      id : postData.id
+    })
+  }
+},[Liker, postData, loginInfo]);
 
-if(!v && !i) {
+
+if(!postData && !index) {
   return <div></div>
 }
 
   return (
     <div onClick={onClickEmpty}>
-        <div key={v + i + 'post' + Math.random() * 300}>
+        <div key={postData + index + 'post' + Math.random() * 300}>
 <CenterdDiv>
         <PostViewerBlock>
           <PostHead>
               <DivWrapper>
-            <Link href={`/page/${v?.id}`}>
+            <Link href={`/page/${postData?.id}`}>
               <a><h1 className="title">
-                <span className="number">{i + 1} .</span>{v?.title}
+                <span className="number">{index + 1} .</span>{postData?.title}
                 </h1></a></Link>
-                <HeartTwoTone className="heart" />
+                <div className="like">
+                <HeartTwoTone twoToneColor={Liker ? 'red' : 'gray'} onClick={onClickLike} className="heart" />
+                {postData.Likers.length}
+                </div>
               </DivWrapper>
             <SubInfo>
             <span onClick={onClickUser}>
-              {v?.User?.Images && 
+              {postData?.User?.Images && 
               <AvartarStyle
                 size={24}
-                src={`http://localhost:3055/${v.User?.Images[0]?.src}`}
+                src={`http://localhost:3055/${postData.User?.Images[0]?.src}`}
               ></AvartarStyle>}
-              <b>{v?.User?.nickname}</b>
+              <b>{postData?.User?.nickname}</b>
             </span>
-              <span>{moment(v?.createdAt).format('YYYY.MM.DD')}</span>
-              <span className="edit">{v?.UserId === loginInfo?.id ? 
+              <span>{moment(postData?.createdAt).format('YYYY.MM.DD')}</span>
+              <span className="edit">{postData?.UserId === loginInfo?.id ? 
               <Dropdown 
               placement="bottomRight" 
               overlay={
                 <Menu>
-                <Menu.Item onClick={() => Router?.replace(`/write?PostId=${v?.id}`)}>수정</Menu.Item>
-                <Menu.Item onClick={deletePost(v?.id)}>삭제</Menu.Item>
+                <Menu.Item onClick={() => Router?.replace(`/write?PostId=${postData?.id}`)}>수정</Menu.Item>
+                <Menu.Item onClick={deletePost(postData?.id)}>삭제</Menu.Item>
                 </Menu>
             }>
               <SmallDashOutlined/>
@@ -236,15 +274,15 @@ if(!v && !i) {
                </span>
             </SubInfo>
             <Tags>
-              {v?.Hashtags?.map((tags, index) => (
-                 <Typography.Text onClick={searchHashtag(tags?.name)} key={tags + '_' + index} code className="tag">{tags.name}</Typography.Text>
+              {postData?.Hashtags?.map((tags, idx) => (
+                 <Typography.Text onClick={searchHashtag(tags?.name)} key={tags + '_' + idx} code className="tag">{tags.name}</Typography.Text>
               ))}
             </Tags>
           </PostHead>
           {/* <PostContent dangerouslySetInnerHTML={{ __html: v.content.length > 50 ? v.content.slice(0,50) +' ....' : v.content }} /> */}
         </PostViewerBlock>
       </CenterdDiv>
-        {i !== PostsData?.length - 1 &&  Math.floor(i % 2) === 0 &&
+        {index !== PostsData?.length - 1 &&  Math.floor(index % 2) === 0 &&
     (<LineWrapperDiv style={{ display : 'flex', justifyContent : 'center' }}>
     {/* <LineStyledDiv></LineStyledDiv>
     <CircleDiv></CircleDiv> */}

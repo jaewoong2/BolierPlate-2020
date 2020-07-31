@@ -29,6 +29,10 @@ const initialState = {
   deleteCommentDone : false,
   deleteCommentError : null,
   
+  likePostLoading : false,
+  likePostDone : false,
+  likePostError : null,
+
   PageNation: false,
   toggleTag: false,
   InfinityScroll: true,
@@ -79,6 +83,15 @@ export const SUBMIT_COMMENT_FAILURE = "SUBMIT_COMMENT_FAILURE";
 export const DELETE_COMMENT_REQUEST = "DELETE_COMMENT_REQUEST";
 export const DELETE_COMMENT_SUCCESS = "DELETE_COMMENT_SUCCESS";
 export const DELETE_COMMENT_FAILURE = "DELETE_COMMENT_FAILURE";
+
+export const LIKE_POST_REQUEST = "LIKE_POST_REQUEST";
+export const LIKE_POST_SUCCESS = "LIKE_POST_SUCCESS";
+export const LIKE_POST_FAILURE = "LIKE_POST_FAILURE";
+
+export const UNLIKE_POST_REQUEST = "UNLIKE_POST_REQUEST";
+export const UNLIKE_POST_SUCCESS = "UNLIKE_POST_SUCCESS";
+export const UNLIKE_POST_FAILURE = "UNLIKE_POST_FAILURE";
+
 
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
@@ -191,7 +204,7 @@ const reducer = (state = initialState, action) => {
         case SUBMIT_COMMENT_REQUEST:
           draft.submitCommentLoading = true;
           draft.submitCommentDone = false;
-          draft.submitCommentFailure = null;
+          draft.submitCommentError = null;
           break;
         case SUBMIT_COMMENT_SUCCESS:
           draft.submitCommentLoading = false;
@@ -200,14 +213,14 @@ const reducer = (state = initialState, action) => {
         case SUBMIT_COMMENT_FAILURE:
           draft.submitCommentLoading = false;
           draft.submitCommentDone = true;
-          draft.submitCommentFailure = action.error;
+          draft.submitCommentError = action.error;
           break;
   
           
       case LOAD_ONE_POST_REQUEST:
         draft.loadPostsLoading = true;
         draft.loadPostsDone = false;
-        draft.loadPostsFailure = null;
+        draft.loadPostsError = null;
         break;
 
       case LOAD_ONE_POST_SUCCESS:
@@ -219,13 +232,13 @@ const reducer = (state = initialState, action) => {
       case LOAD_ONE_POST_SUCCESS:
         draft.loadPostsLoading = false;
         draft.loadPostsDone = true;
-        draft.loadPostsFailure = action.error;
+        draft.loadPostsError = action.error;
         break;
 
         case DELETE_COMMENT_REQUEST:
           draft.deleteCommentLoading = true;
           draft.deleteCommentDone = false;
-          draft.deleteCommentFailure = null;
+          draft.deleteCommentError = null;
           break;
         case DELETE_COMMENT_SUCCESS:
           draft.deleteCommentLoading = false;
@@ -234,10 +247,46 @@ const reducer = (state = initialState, action) => {
         case DELETE_COMMENT_FAILURE:
           draft.deleteCommentLoading = false;
           draft.deleteCommentDone = true;
-          draft.deleteCommentFailure = action.error;
+          draft.deleteCommentError = action.error;
           break;
-  
 
+          
+        case LIKE_POST_REQUEST:
+          draft.likePostLoading = true;
+          draft.likePostDone = false;
+          draft.likePostError = null;
+          break;
+        case LIKE_POST_SUCCESS:
+          draft.likePostLoading = false;
+          draft.likePostDone = true;
+          draft.PostsData = draft.PostsData.map((post) => post.id === action.data.id ? action.data : post);
+          draft.onePost = action.data;
+          break;
+        case LIKE_POST_FAILURE:
+          draft.likePostLoading = false;
+          draft.likePostDone = true;
+          draft.likePostError = action.error;
+          break;
+
+
+          case UNLIKE_POST_REQUEST:
+            draft.likePostLoading = true;
+            draft.likePostDone = false;
+            draft.likePostError = null;
+            break;
+          case UNLIKE_POST_SUCCESS: 
+               draft.likePostLoading = false;
+               draft.likePostDone = true;
+               draft.PostsData = draft.PostsData.map((post) => post.id === action.data.id ? action.data : post);
+                draft.onePost = action.data;
+            break;
+
+          case UNLIKE_POST_FAILURE:
+            draft.likePostLoading = false;
+            draft.likePostDone = true;
+            draft.likePostError = action.error;
+            break;
+  
 
 
 

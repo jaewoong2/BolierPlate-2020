@@ -1,6 +1,6 @@
 import { takeLatest, call, fork, all, put, throttle, delay } from "redux-saga/effects"
 import axios from 'axios';
-import { WRTIE_SUCCESS, WRTIE_FAILURE, WRTIE_REQUEST, LOAD_MYPOST_REQUEST, LOAD_MYPOST_SUCCESS, LOAD_MYPOST_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_SUCCESS, DELETE_POST_REQUEST, DELETE_POST_SUCCESS, DELETE_POST_FAILURE, HASHTAG_SEARCH_REQUEST, HASHTAG_SEARCH_SUCCESS, HASHTAG_SEARCH_FAILURE, LOAD_POSTS_REQUEST, LOAD_POSTS_SUCCESS, LOAD_POSTS_FAILURE, COVER_POST, SUBMIT_COMMENT_REQUEST, SUBMIT_COMMENT_SUCCESS, SUBMIT_COMMENT_FAILURE, LOAD_ONE_POST_REQUEST, LOAD_ONE_POST_SUCCESS, LOAD_ONE_POST_FAILURE, DELETE_COMMENT_REQUEST, DELETE_COMMENT_FAILURE, DELETE_COMMENT_SUCCESS } from "../reducer/post";
+import { WRTIE_SUCCESS, WRTIE_FAILURE, WRTIE_REQUEST, LOAD_MYPOST_REQUEST, LOAD_MYPOST_SUCCESS, LOAD_MYPOST_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_SUCCESS, DELETE_POST_REQUEST, DELETE_POST_SUCCESS, DELETE_POST_FAILURE, HASHTAG_SEARCH_REQUEST, HASHTAG_SEARCH_SUCCESS, HASHTAG_SEARCH_FAILURE, LOAD_POSTS_REQUEST, LOAD_POSTS_SUCCESS, LOAD_POSTS_FAILURE, COVER_POST, SUBMIT_COMMENT_REQUEST, SUBMIT_COMMENT_SUCCESS, SUBMIT_COMMENT_FAILURE, LOAD_ONE_POST_REQUEST, LOAD_ONE_POST_SUCCESS, LOAD_ONE_POST_FAILURE, DELETE_COMMENT_REQUEST, DELETE_COMMENT_FAILURE, DELETE_COMMENT_SUCCESS, LIKE_POST_REQUEST, LIKE_POST_FAILURE, LIKE_POST_SUCCESS, UNLIKE_POST_REQUEST, UNLIKE_POST_FAILURE, UNLIKE_POST_SUCCESS } from "../reducer/post";
 
 
 // 글쓰기
@@ -228,6 +228,56 @@ function* watchDeleteCommit() {
 }
 
 
+function likePostAPI(id) {
+    return axios.patch(`/post/like/${id}`)
+}
+
+function* likePost(action) {
+    try {  
+        const result = yield call(likePostAPI, action.id)
+        yield put({
+            type : LIKE_POST_SUCCESS,
+            data : result.data,
+        })
+        
+    } catch(err) {
+        console.error(err)
+        yield put({
+            type : LIKE_POST_FAILURE,
+            error : err.response.data
+        })
+    }
+}
+
+function* watchLikePost() {
+    yield takeLatest(LIKE_POST_REQUEST, likePost);
+}
+
+function unLikePostAPI(id) {
+    return axios.delete(`/post/unlike/${id}`)
+}
+
+function* unLikePost(action) {
+    try {  
+        const result = yield call(unLikePostAPI, action.id)
+        yield put({
+            type : UNLIKE_POST_SUCCESS,
+            data : result.data,
+        })
+        
+    } catch(err) {
+        console.error(err)
+        yield put({
+            type : UNLIKE_POST_FAILURE,
+            error : err.response.data
+        })
+    }
+}
+
+function* watchUnLikePost() {
+    yield takeLatest(UNLIKE_POST_REQUEST, unLikePost);
+}
+
 
 
 function* watchCoverUp() {
@@ -251,5 +301,7 @@ export default function* postSaga() {
         fork(watchSubmitCommit),
         fork(watchLoadOnePost),
         fork(watchDeleteCommit),
+        fork(watchLikePost),
+        fork(watchUnLikePost)
     ])
 }

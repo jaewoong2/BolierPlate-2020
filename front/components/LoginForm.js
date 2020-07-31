@@ -12,10 +12,10 @@ const LoginForm = ({ setVisible : LoginFinish }) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-      loginDone && !loginLoading && LoginFinish(() => {
+      loginInfo.id && loginDone && !loginLoading && LoginFinish(() => {
         return false
     })
-    },[loginLoading, loginDone])
+    },[loginLoading, loginDone, loginInfo.id])
 
     useEffect(() => {
       if(loginInfo?.email) {

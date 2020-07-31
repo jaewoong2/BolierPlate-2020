@@ -24,6 +24,14 @@ router.get('/', removeHtmlAndShorten, async (req, res, next) => {
                     model : Image,
                     attributes : ['src']
                 }]
+            },{
+                model : User,
+                attributes : ['id', 'nickname'],
+                as : 'Likers',
+                include : [{
+                    model : Image,
+                    attributes : ['src']
+                }]
             }, {
                 model : Hashtag  
             }]
