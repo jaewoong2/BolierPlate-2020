@@ -1,7 +1,7 @@
 const express = require('express');
 const { Op } = require('sequelize');
 const { removeHtmlAndShorten } = require('./sanitizeMiddle');
-const { Post, Image, Comment, User, Hashtag } = require('../models');
+const { Post, Image, Comment, User, Hashtag, View } = require('../models');
 const router = express.Router();
 
 router.get('/', removeHtmlAndShorten, async (req, res, next) => {
@@ -34,6 +34,9 @@ router.get('/', removeHtmlAndShorten, async (req, res, next) => {
                 }]
             }, {
                 model : Hashtag  
+            }, {
+                model : View,
+                attributes : ['id']
             }]
         })
         res.status(201).json(fullPost)

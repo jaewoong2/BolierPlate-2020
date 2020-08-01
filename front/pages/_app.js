@@ -21,4 +21,5 @@ const booilerPlate = ({Component, pageProps}) => {
     )
 }
 
-export default wrapper.withRedux(withReduxSaga(booilerPlate));
+// export default wrapper.withRedux(withReduxSaga(booilerPlate));
+export default wrapper.withRedux(booilerPlate)

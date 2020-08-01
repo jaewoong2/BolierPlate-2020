@@ -41,11 +41,22 @@ router.delete('/:commentId', async(req, res, next) => {
         }
         const commentid = req.params.commentId;
         const comment = await Comment.findOne({
-            where : {id : req.params.commentId}
+            where : { id : req.params.commentId }
         })
-        await Comment.destroy({ where : { CommentId : comment.id }})
-        await Comment.destroy({ where : { id : commentid, UserId : req.user.id }})
+        // const recomment = await Comment.findOne({
+        //     where : { CommentId : comment.id }
+        // })
+        // await Comment.destroy({ where : { CommentId : comment.id }})
+        // await Comment.destroy({ where : { id : commentid, UserId : req.user.id }})
 
+            const recomment = await Comment.findAll({
+                where : { CommentId : commentid }
+            })
+            recomment.map( async v => {
+                await Comment.destroy({ where : { CommentId : v.id }})
+            })
+            await Comment.destroy({ where : { CommentId : comment.id }})
+            await Comment.destroy({ where : { id : commentid, UserId : req.user.id }})
         res.status(201).send('삭제 성공')
     } catch(err) {
         console.error(err)

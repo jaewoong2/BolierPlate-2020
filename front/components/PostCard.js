@@ -7,7 +7,7 @@ import { Avatar, Dropdown, Menu, Typography, message } from 'antd';
 import Link from 'next/link';
 import moment from 'moment';
 import 'moment/locale/ko'
-import { SmallDashOutlined, HeartTwoTone, CiCircleTwoTone, SmileOutlined } from '@ant-design/icons';
+import { SmallDashOutlined, HeartTwoTone, CiCircleTwoTone, SmileOutlined, EyeOutlined } from '@ant-design/icons';
 import  Router from 'next/router';
 moment.locale('ko')
 
@@ -121,10 +121,21 @@ const DivWrapper = styled.div`
     justify-content : space-between;
     /* align-items : center; */
 
+  .veiw {
+    display : flex;
+    align-items : center;
+    font-size : 15px;
+
+    .viewnumber {
+      margin-left : 2px;
+      margin-right : 7px;
+    }
+  }
     .heart {
       font-size : 16px;
       cursor : pointer;
     }
+
     span {
       color : #686767;
       font-style : italic;
@@ -143,14 +154,20 @@ const DivWrapper = styled.div`
     
     .like {
     display : flex;
+    justify-content : flex-end;
 
     .heart {    
         display : flex;
         align-items : center;
         font-size : 15px;
+        margin : 0;
+        padding : 0;
+        margin-right : 4px;
     }    
 
     span {
+      margin : 0;
+      padding : 0;
         margin-right : 10px;
         font-size : 18px;
         font-style : italic;
@@ -244,10 +261,15 @@ if(!postData && !index) {
               <a><h1 className="title">
                 <span className="number">{index + 1} .</span>{postData?.title}
                 </h1></a></Link>
+                <div className="veiw">
+                <EyeOutlined/><span className="viewnumber" >{postData?.Views?.length}</span>
                 <div className="like">
                 <HeartTwoTone twoToneColor={Liker ? 'red' : 'gray'} onClick={onClickLike} className="heart" />
-                {postData.Likers.length}
+                <span>
+                  {postData?.Likers?.length}
+                  </span>
                 </div>
+                  </div>
               </DivWrapper>
             <SubInfo>
             <span onClick={onClickUser}>

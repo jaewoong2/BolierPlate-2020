@@ -6,6 +6,11 @@ import { useSelector, useDispatch } from 'react-redux'
 import { LOAD_POSTS_REQUEST, HASHTAG_SEARCH_REQUEST } from '../reducer/post'
 import { LOAD_MYINFO_REQUEST } from '../reducer/user'
 import Infomation from '../components/Infomation/Infomation'
+import wrapper from '../store/configureStore';
+import { END } from 'redux-saga';
+import axios from 'axios';
+
+
 
 const Home = () => {
   const { toggleTag, InfinityScroll, PostsData, loadPostsLoading, hashtagSearchLoading, tagName, PageNation } =  useSelector(state => state.post);
@@ -28,14 +33,6 @@ const Home = () => {
         }
       }
   },[InfinityScroll, PostsData, loadPostsLoading, hashtagSearchLoading, tagName])
-
-    
-
-  useEffect(() => {          
-    dispatch({
-      type : LOAD_MYINFO_REQUEST,
-    })
-  },[])
 
   useEffect(() => {
     !tagName && dispatch({
@@ -72,4 +69,21 @@ const Home = () => {
   )
 }
 
-export default Home
+export const getServerSideProps = wrapper.getServerSideProps( async (context) => {
+  const cookie = context.req ? context.req.headers.cookie : '';
+  axios.defaults.headers.Cookie = ''; // 로그인 전에는 쿠키 제거
+  //로그인이 공유되는 것을 주의해야함 (내 쿠키값이 한번 넣어지고 그게 저장되서)
+  if(context.req && cookie) { // 로그인 하고나서는
+      axios.defaults.headers.Cookie = cookie;
+  }
+  context.store.dispatch({
+      type: LOAD_POSTS_REQUEST,
+  });
+  context.store.dispatch({
+      type: LOAD_MYINFO_REQUEST,
+  });
+  context.store.dispatch(END); // dispatch가 끝나는것을 기다려줌
+  await context.store.sagaTask.toPromise(); // saga 서버사이드를 위해서
+}); // 이부분이 home 보다 먼저 시작된다
+
+export default Home;

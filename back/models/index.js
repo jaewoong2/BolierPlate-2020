@@ -11,6 +11,7 @@ db.User = require('./user')(sequelize, Sequelize);
 db.Hashtag = require('./hashtag')(sequelize, Sequelize);
 db.Comment = require('./comment')(sequelize, Sequelize);
 db.Introduce = require('./introduce')(sequelize, Sequelize);
+db.View = require('./view')(sequelize, Sequelize);
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {

@@ -8,27 +8,48 @@ import 'moment/locale/ko'
 import styled from 'styled-components';
 import { message, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST, COVER_POST, LOAD_ONE_POST_REQUEST, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST } from '../../reducer/post';
+import { DELETE_POST_REQUEST, HASHTAG_SEARCH_REQUEST, COVER_POST, LOAD_ONE_POST_REQUEST, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST, LOAD_POSTS_REQUEST } from '../../reducer/post';
 import { LOAD_MYINFO_REQUEST } from '../../reducer/user';
-import { HeartTwoTone, HeartOutlined } from '@ant-design/icons';
+import { HeartTwoTone, HeartOutlined, EyeOutlined } from '@ant-design/icons';
 import CommentInput from '../../components/Comment/CommentInput';
 import CommentContainer from '../../components/Comment/CommentContainer';
+import { END } from 'redux-saga';
+import wrapper from '../../store/configureStore'
 
 
 const LikeDiv = styled.div`
     display : flex;
-    margin : 10px 0px 0px 4vw;
+    margin-top : 10px;
     margin-right : 5vw;
 
     .heart {    
         display : flex;
         align-items : center;
-        font-size : 20px;
+        font-size : 17px;
+        margin-left : 5px;
     }    
 
     span {
         margin-right : 10px;
         font-size : 18px;
+        font-style : italic;
+    }
+`
+const ViewDiv = styled.div`
+    display : flex;
+    margin-top : 10px;
+    margin-left : 3px;
+    align-items : center;
+
+    .viewicon {
+        display : flex;
+        align-items : center;
+        font-size : 17px;
+        margin-left : 5px;
+    }
+    span {
+        font-size : 18px;
+        margin-right : 3px;
         font-style : italic;
     }
 `
@@ -120,7 +141,7 @@ const DivEdit = styled.div`
     color : #777;
 
     justify-content : flex-end;
-    margin : 10px 5vw 0px 0px;
+    margin : 10px 10px 0px 0px;
 
  .tagging {
     justify-content : flex-start;
@@ -167,16 +188,10 @@ const page = () => {
 
     useEffect(() => {
         dispatch({
-            type : LOAD_MYINFO_REQUEST,
-        })
-    },[])
-
-    useEffect(() => {
-        dispatch({
             type : LOAD_ONE_POST_REQUEST,
             id 
         })
-    },[submitCommentDone && !submitCommentLoding, deleteCommentDone && !deleteCommentLoding])
+    },[loginInfo.id, submitCommentDone && !submitCommentLoding, deleteCommentDone && !deleteCommentLoding])
 
     useEffect(() => {
         if(data === null) {
@@ -236,7 +251,8 @@ const page = () => {
     
 const flexDivMemo = useMemo(() => {
     return {
-        display : 'flex'
+        display : 'flex',
+        alignItems : 'center'
     }
 })
 
@@ -293,16 +309,22 @@ const divEditContainerMemo = useMemo(() => {
             <DivEditOne>
                 {data?.Hashtags?.map(v => <StyledTags onClick={searchHashtag(v.name)} keyboard>{v.name}</StyledTags>)}
             </DivEditOne>
+            <div style={flexDivMemo}>
                 {data?.UserId === loginInfo?.id && 
                 <DivEdit>
                     <p onClick={() => Router.replace(`/write?PostId=${parseInt(data.id, 10)}`)}>수정</p>
                     <p>/</p>
                     <p onClick={deletePost(data?.id)}>삭제</p>
                 </DivEdit>}
+                <ViewDiv>
+                <EyeOutlined className="viewicon"/>
+                <span>{data?.Views?.length}</span>
+                </ViewDiv>
                 <LikeDiv>
                 <HeartTwoTone onClick={onClickLike} className="heart" twoToneColor={liker?.id ? 'red' : 'gray'} />
                 <span>{data?.Likers?.length}</span>
                 </LikeDiv>
+            </div>
             </div>
             <PostContent>
             <QuillStyleDiv dangerouslySetInnerHTML={{__html : data?.content}}/>
@@ -312,5 +334,24 @@ const divEditContainerMemo = useMemo(() => {
         </MyLayout>
     )
 }
+
+export const getServerSideProps = wrapper.getServerSideProps( async (context) => {
+    const cookie = context.req ? context.req.headers.cookie : '';
+    axios.defaults.headers.Cookie = ''; // 로그인 전에는 쿠키 제거
+    //로그인이 공유되는 것을 주의해야함 (내 쿠키값이 한번 넣어지고 그게 저장되서)
+    if(context.req && cookie) { // 로그인 하고나서는
+        axios.defaults.headers.Cookie = cookie;
+    }
+    context.store.dispatch({
+        type: LOAD_ONE_POST_REQUEST,
+        id : context.params.id,
+    });
+    context.store.dispatch({
+        type: LOAD_MYINFO_REQUEST,
+    });
+    context.store.dispatch(END); // dispatch가 끝나는것을 기다려줌
+    await context.store.sagaTask.toPromise(); // saga 서버사이드를 위해서
+  }); // 이부분이 home 보다 먼저 시작된다
+  
 
 export default page;

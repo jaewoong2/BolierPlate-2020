@@ -243,6 +243,7 @@ router.get('/:userid', async (req, res, next) => { // 프로필 정보창 받아
                 model : Introduce
             }]
         });
+        
         res.status(201).json(fullUser)
     } catch(err) {
         console.error(err)

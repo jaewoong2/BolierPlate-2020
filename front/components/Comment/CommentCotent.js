@@ -30,18 +30,18 @@ const CommentCotent = ({comment, user}) => {
             id : comment?.User?.id
         })
     },[comment])
-
-const onClickReply = useCallback(() => {
-    RecommentInfo !== comment && dispatch({
-        type : RECOMMENT_TOGGLE,
-        data : {
-            comment : comment
-        }
-    })
-    RecommentInfo === comment && dispatch({
-        type : RECOMMENT_TOGGLE,
-        data : { comment : null }
-    })
+    
+    const onClickReply = useCallback(() => {
+        RecommentInfo !== comment && dispatch({
+            type : RECOMMENT_TOGGLE,
+            data : {
+                comment : comment
+            }
+        })
+        RecommentInfo === comment && dispatch({
+            type : RECOMMENT_TOGGLE,
+            data : { comment : null }
+        })
 },[comment, RecommentInfo])
 
 const onClickOpenReply = useCallback(() => {

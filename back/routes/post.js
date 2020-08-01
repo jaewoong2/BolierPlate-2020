@@ -1,5 +1,5 @@
 const express = require('express');
-const { Post, Image, Comment, Introduce, User, Hashtag } = require('../models');
+const { Post, Image, Comment, Introduce, User, Hashtag, View } = require('../models');
 const router = express.Router()
 const multer = require('multer');
 const path = require('path');
@@ -7,6 +7,7 @@ const fs = require('fs');
 const { removeHtmlAndShorten } = require('./sanitizeMiddle');
 const { Op } = require('sequelize');
 const dotenv = require('dotenv');
+const {cookieParsers} = require('./parseCookie');
 
 dotenv.config();
 
@@ -78,6 +79,9 @@ router.delete('/unlike/:postid', async(req, res, next) => {
                     model : Image,
                     attributes : ['src']
                 }]
+            }, {
+                model : View,
+                attributes : ['id']
             }]
         })
         res.status(201).json(fullpost)
@@ -130,6 +134,9 @@ router.patch('/like/:postid', async(req, res, next) => {
                     model : Image,
                     attributes : ['src']
                 }]
+            }, {
+                model : View,
+                attributes : ['id']
             }]
         })
         res.status(201).json(fullpost)
@@ -156,6 +163,7 @@ router.post('/comment', async (req, res, next) => {
             UserId : req.user.id,
             PostId : post.id,
             CommentId : req.body.commentid,
+            // CommentId는 대댓글의 댓글
         })
         
         const fullpost = await Post.findOne({
@@ -190,6 +198,9 @@ router.post('/comment', async (req, res, next) => {
                     model : Image,
                     attributes : ['src']
                 }]
+            }, {
+                model : View,
+                attributes : ['id']
             }]
         })
         res.status(201).json(fullpost)
@@ -333,6 +344,9 @@ router.patch('/', removeHtmlAndShorten ,async (req, res, next) => {
                 model : Image,
                 attributes : ['src']
             }]
+        }, {
+            model : View,
+            attributes : ['id']
         }]
     })
     res.status(201).json(fullpost)
@@ -376,6 +390,9 @@ router.get('/', removeHtmlAndShorten, async (req, res, next) => {
                 }]
             }, {
                 model : Hashtag  
+            }, {
+                model : View,
+                attributes : ['id']
             }]
         })
         res.status(201).json(fullPost)
@@ -386,11 +403,26 @@ router.get('/', removeHtmlAndShorten, async (req, res, next) => {
 })
 
 
-router.get('/:postId',  async (req, res, next) => {
+router.get('/:postId', cookieParsers, async (req, res, next) => {
     try {
+        const view = await View.findOne({
+            where : { name : req.cookie, PostId : req.params.postId}
+        });
+        const post = await Post.findOne({
+            where : { id : req.params.postId }
+        })
+        if(!view) {
+            const hit = await View.create({
+                name : req.cookie
+            })
+            await post.addViews(hit.id)
+        }
         const fullPost = await Post.findOne({
-            where : {id : req.params.postId},
+            where : {id : req.params.postId },
             include : [{
+                model : View,
+                attributes : ["id"]
+            }, {
                 model : Image,
             }, {
                 model : Comment,
@@ -506,6 +538,9 @@ router.get('/hashtag/:tagname', async (req, res, next) => {
                 }]
             }, {
                 model : Hashtag
+            }, {
+                model : View,
+                attributes : ['id']
             }]
         });
 
