@@ -170,6 +170,7 @@ const reducer = (state = initialState, action) => {
         draft.PostsData = draft.PostsData.filter(
           (v) => v.id !== action.data.PostId
         );
+        draft.onePost = null;
         break;
       case DELETE_POST_FAILURE:
         draft.deletePostLoading = false;
@@ -229,7 +230,7 @@ const reducer = (state = initialState, action) => {
         draft.onePost = action.data;
         break;
 
-      case LOAD_ONE_POST_SUCCESS:
+      case LOAD_ONE_POST_FAILURE:
         draft.loadPostsLoading = false;
         draft.loadPostsDone = true;
         draft.loadPostsError = action.error;
@@ -278,7 +279,7 @@ const reducer = (state = initialState, action) => {
                draft.likePostLoading = false;
                draft.likePostDone = true;
                draft.PostsData = draft.PostsData.map((post) => post.id === action.data.id ? action.data : post);
-                draft.onePost = action.data;
+              draft.onePost = action.data;
             break;
 
           case UNLIKE_POST_FAILURE:

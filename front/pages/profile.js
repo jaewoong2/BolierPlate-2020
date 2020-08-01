@@ -35,13 +35,10 @@ const StyledAvartar = styled(Avatar)`
 
     &:hover {
         cursor : pointer;
+        opacity : 0.7;
+        transition : opacity 0.5s;
     }
 
-    img {
-        &:hover {
-            width : 10%;
-        }
-    }
 `
 
 const StyleDiv = styled.div`
@@ -169,7 +166,6 @@ export const getServerSideProps = wrapper.getServerSideProps( async (context) =>
     //로그인이 공유되는 것을 주의해야함 (내 쿠키값이 한번 넣어지고 그게 저장되서)
     if(context.req && cookie) { // 로그인 하고나서는
         axios.defaults.headers.Cookie = cookie;
-        console.log(cookie);
     }
     context.store.dispatch({
         type: LOAD_MYINFO_REQUEST,

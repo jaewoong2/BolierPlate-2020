@@ -178,13 +178,14 @@ const page = () => {
     const router = useRouter();
     const { id } = router.query;
     const { loginInfo } = useSelector((state) => state.user);
-    const { CoverUp, onePost : data, submitCommentDone, submitCommentLoding, deleteCommentDone, deleteCommentLoding } = useSelector((state) => state.post);
+    const { CoverUp, onePost : data, loadPostsError, submitCommentDone, submitCommentLoding, deleteCommentDone, deleteCommentLoding } = useSelector((state) => state.post);
 
     const [liker, setLiker] = useState({})
 
     useEffect(() => {
         setLiker(data?.Likers?.map(liker => liker?.id === loginInfo?.id ? liker : false).filter(v => v !== false)[0]);
-    },[data])
+    },[data, loginInfo])
+
 
     useEffect(() => {
         dispatch({
@@ -199,6 +200,13 @@ const page = () => {
                 Router.back();
         }
     },[data])
+
+    useEffect(() => {
+        loadPostsError && (() => {
+            message.error('에러 발생...');
+            Router.back();
+        })()
+    },[loadPostsError])
     
   const deletePost = useCallback((id) => () => {
     dispatch({
@@ -238,11 +246,11 @@ const page = () => {
         } else {
           !liker && dispatch({
             type : LIKE_POST_REQUEST,
-            id : data.id
+            id : data?.id
           });
           liker && dispatch({
             type : UNLIKE_POST_REQUEST,
-            id : data.id
+            id : data?.id
           })
         }
       },[liker, data, loginInfo]);
@@ -293,7 +301,7 @@ const divEditContainerMemo = useMemo(() => {
 
     return (
         <MyLayout>
-           {data.id ? <div onClick={onClickCoverDown}>
+           {data?.id ? <div onClick={onClickCoverDown}>
             <Containertitle><h1>{data?.title}</h1></Containertitle>
             <DivContainer>
     <div style={flexDivMemo}>
@@ -307,7 +315,7 @@ const divEditContainerMemo = useMemo(() => {
             </BorderDiv>
             <div style={divEditContainerMemo}>
             <DivEditOne>
-                {data?.Hashtags?.map(v => <StyledTags onClick={searchHashtag(v.name)} keyboard>{v.name}</StyledTags>)}
+                {data?.Hashtags?.map(v => <StyledTags onClick={searchHashtag(v?.name)} keyboard>{v?.name}</StyledTags>)}
             </DivEditOne>
             <div style={flexDivMemo}>
                 {data?.UserId === loginInfo?.id && 
