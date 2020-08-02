@@ -54,7 +54,6 @@ const StyledMenuForInputSearch = styled(Menu.Item)`
 
 const StyledInputSearch = styled(Input.Search)`
 `
-
 const NavBar = () => {
     const [current, setCurrent] = useState("");
     const [visible, setVisible] = useState(false);
@@ -94,8 +93,6 @@ const NavBar = () => {
     // })
   },[loadPostsLoading, loadPostsDone, queryname, tagName])
   
-  
-
 
   const onLogOut = useCallback(() => {
     dispatch({

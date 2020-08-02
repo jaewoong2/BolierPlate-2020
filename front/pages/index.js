@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import MyLayout from '../components/MyLayout'
-import PostCard from '../components/PostCard'
+import PostCard from '../components/PostCard/PostCard'
 import HashtagSearch from '../components/HashtagSearch'
 import { useSelector, useDispatch } from 'react-redux'
 import { LOAD_POSTS_REQUEST, HASHTAG_SEARCH_REQUEST } from '../reducer/post'
 import { LOAD_MYINFO_REQUEST } from '../reducer/user'
-import Infomation from '../components/Infomation/Infomation'
 import wrapper from '../store/configureStore';
 import { END } from 'redux-saga';
 import axios from 'axios';

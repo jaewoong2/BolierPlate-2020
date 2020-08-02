@@ -5,6 +5,8 @@ import { useCallback } from 'react';
 import ModalForm from './ModalForm';
 import { useDispatch, useSelector } from 'react-redux'
 import { LOG_IN_REQUEST } from '../reducer/user';
+import styled from 'styled-components';
+
 
 const LoginForm = ({ setVisible : LoginFinish }) => {
     const { loginLoading, loginDone, loginInfo } = useSelector(state => state.user); 
@@ -58,13 +60,11 @@ const LoginForm = ({ setVisible : LoginFinish }) => {
                   placeholder="Password"
                 />
               </Form.Item>
-              
               <Form.Item>
                 <Form.Item name="remember" valuePropName="checked" noStyle>
                   <Checkbox>Remember</Checkbox>
                 </Form.Item>
               </Form.Item>
-        
               <Form.Item>
                 <Button loading={loginLoading} type="primary" htmlType="submit" className="login-form-button">
                   로그인

@@ -3,7 +3,6 @@ import { Row, Col, Dropdown } from 'antd'
 import styled from 'styled-components';
 import NavBar from './NavBar';
 import Editor from './Edit/Editor';
-import PostCard from './PostCard';
 import { EditOutlined, HeartFilled, StarOutlined, StarFilled, TagsOutlined, PaperClipOutlined } from '@ant-design/icons';
 import Text from 'antd/lib/typography/Text';
 import Router, { useRouter } from 'next/router';
@@ -12,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ModalForm from './ModalForm';
 import PageNation from './PageNation/PageNation';
 import Infomation from './Infomation/Infomation';
+import LoginForm from './FormComponent/LoginForm';
 
 const FullDiv = styled.div`
 background-color : #ffffff9d;
@@ -145,6 +145,7 @@ const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
     return (
       <>
       {CoverUp && <FullDiv onClick={clickCoverUp}/> }
+        <LoginForm/>
     <RowStyled onClick={clickCoverUp} justify="space-between" align="middle">
       <Col xs={24} md={3}  span={4}>
       </Col>

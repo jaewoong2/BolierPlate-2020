@@ -199,6 +199,7 @@ router.post('/login', (req, res, next) => {
             const fullUserWithoutPassword = await User.findOne({
                 where : { id : user.id },
                 attributes : ['email', 'nickname', 'id'],
+                order : [[{ model : Post },'createdAt', "DESC"],[{model : Post, as: 'Liked'},'createdAt', "DESC"]],
                 include : [{
                     model : Post
                 }, {
@@ -207,6 +208,9 @@ router.post('/login', (req, res, next) => {
                     model : Comment
                 }, {
                     model : Introduce
+                }, {
+                    model : Post,
+                    as : 'Liked',
                 }]
             });
             return res.status(200).json(fullUserWithoutPassword)
@@ -241,6 +245,9 @@ router.get('/:userid', async (req, res, next) => { // 프로필 정보창 받아
                 model : Comment
             }, {
                 model : Introduce
+            }, {
+                model : Post,
+                as : 'Liked',
             }]
         });
         

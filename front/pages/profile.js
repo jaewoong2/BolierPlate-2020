@@ -79,7 +79,6 @@ const profile = () => {
     const cardUseMemo = useMemo(() => {
         return {
             border : 0,
-            borderTop : '2px dashed #54a1e96e', 
             backgroundColor : 'inherit ',  
             height : '80%', 
             marginTop : '10px',

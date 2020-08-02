@@ -130,6 +130,17 @@ const InfomationUserPost = ({ User }) => {
                 </div>
             </Col>
                 ))}
+        {clicked === '좋아요' && User?.Liked?.map((v, i) => 
+            (<Col xs={24} className="contentWrapper">
+            <div className="title">
+                    <Link href={`/page/${v?.id}`}><a>{i + 1}. {v?.title}</a></Link>
+                    </div>
+                    <div className="innerHtml" dangerouslySetInnerHTML={{__html : v?.content.length > 20 ? v?.content?.slice(0, 19) + '...' : v?.content}} />   
+                    <div>
+                    <b>{moment(v?.createdAt).format('MM.DD.')}</b>             
+                    </div>
+                </Col>
+        ))}
         </Col>
         </StyledDivForContainer>
     )
