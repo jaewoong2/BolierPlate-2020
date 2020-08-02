@@ -65,7 +65,7 @@ const profile = () => {
         !loginInfo.email && (() => {
             message.warn('로그인 후 이용 가능합니다')
             Router.replace('/')
-        }) 
+        })()
     },[loginInfo])
     useEffect(() => {
         changeNicknameLoading && message.info('닉네임 변경중...')

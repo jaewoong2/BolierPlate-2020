@@ -38,7 +38,7 @@ const tailFormItemLayout = {
 const SignUp = ({ setVisible }) => {
     const [form] = Form.useForm();
     const dispatch = useDispatch();
-    const [mounted, setMounted] = useState(false);
+    const [register, setRegister] = useState(false);
     const { registerUserLoading, registerUserDone } = useSelector(state => state.user);
 
     // useEffect(() => {
@@ -51,14 +51,14 @@ const SignUp = ({ setVisible }) => {
             type : REGISTER_USER_REQUEST,
             data : values
         })
-        setMounted(true)
+        setRegister(true)
         
     }, []);
 
     useEffect(() => {
-        mounted && !registerUserLoading && setVisible(false)
-        mounted && !registerUserLoading && message.info('회원가입 성공')
-    },[registerUserLoading, registerUserDone, mounted])
+        register && !registerUserLoading && setVisible(false)
+        register && !registerUserLoading && message.info('회원가입 성공')
+    },[registerUserLoading, registerUserDone, register])
 
     return (
         <div>

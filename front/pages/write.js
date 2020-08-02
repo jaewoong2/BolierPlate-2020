@@ -23,7 +23,7 @@ const write = () => {
     const { wrtieLoading, wrtieDone } = useSelector(state => state.post);
     const { loginInfo } = useSelector(state => state.user);
     const router = useRouter();
-    const { data, error } = useSWR(`http://localhost:3055/post/${router.query.PostId}`, fetcher);
+    const { data, error } = router?.query?.PostId ? useSWR(`http://localhost:3055/post/${router.query.PostId}`, fetcher): {};
 
     if(data && data?.UserId !== loginInfo.id) {
         return  <MyLayout><ErrorDiv>접근되지 않는 유저..</ErrorDiv></MyLayout>
@@ -31,7 +31,7 @@ const write = () => {
  
     return (
         <MyLayout>
-            {router.query.PostId ? <Editor data={data}/> :<Editor /> }
+            {router?.query?.PostId ? <Editor data={data}/> :<Editor /> }
             {/* 수정으로 들어왔으면 쿼리 PostId가 있다 */}
         </MyLayout>
     )
