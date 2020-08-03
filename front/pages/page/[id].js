@@ -196,8 +196,8 @@ const page = () => {
 
     useEffect(() => {
         if(data === null) {
-                message.error('존재하지않는 게시물...')
-                Router.back();
+            message.error('존재하지않는 게시물...')
+            Router.back();
         }
     },[data])
 

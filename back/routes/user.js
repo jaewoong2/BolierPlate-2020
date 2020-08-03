@@ -199,7 +199,8 @@ router.post('/login', (req, res, next) => {
             const fullUserWithoutPassword = await User.findOne({
                 where : { id : user.id },
                 attributes : ['email', 'nickname', 'id'],
-                order : [[{ model : Post },'createdAt', "DESC"],[{model : Post, as: 'Liked'},'createdAt', "DESC"]],
+                order : [[{ model : Post },'createdAt', "DESC"],
+                [{model : Post, as: 'Liked'},'createdAt', "DESC"]],
                 include : [{
                     model : Post
                 }, {

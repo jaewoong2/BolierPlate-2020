@@ -46,6 +46,8 @@ router.get('/', removeHtmlAndShorten, async (req, res, next) => {
     }
 })
 
+
+
 router.get('/pagenation', removeHtmlAndShorten, async (req, res, next) => {
     try {
         const fullPost = await Post.findAll({

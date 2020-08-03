@@ -8,6 +8,7 @@ import { LOAD_MYINFO_REQUEST } from '../reducer/user'
 import wrapper from '../store/configureStore';
 import { END } from 'redux-saga';
 import axios from 'axios';
+import SearchForm from '../components/FormComponent/SearchForm'
 
 
 
@@ -61,10 +62,13 @@ const Home = () => {
     loadPostsLoading, PageNation])
 
   return (
+    <>
+    <SearchForm/>
     <MyLayout onScrollHandler={scrollHandler}>
       {toggleTag && <HashtagSearch/>}
       {PostsData?.map((v, i) => <PostCard postData={v} idx={i} />)}
     </MyLayout>
+    </>
   )
 }
 

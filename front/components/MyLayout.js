@@ -32,6 +32,12 @@ const EditBtn = styled(StarFilled)`
   /* box-shadow : 3px 3px 10px #777; */
   filter : drop-shadow( 3px 3px 10px #777);
   color : #a4ce61c0;
+
+  &:hover {
+    color : #cf934ed7;
+    transition : color 0.4s;
+  }
+  transition : color 0.4s;
 `
 
 const TagBtn = styled(TagsOutlined)`
@@ -45,6 +51,12 @@ const TagBtn = styled(TagsOutlined)`
   /* box-shadow : 3px 3px 10px #777; */
   filter : drop-shadow( 3px 3px 10px #777);
   color : #2085a1c7;
+  &:hover {
+    color : #cf934ed7;
+    transition : color 0.4s;
+  }
+  transition : color 0.4s;
+
 `
 const PageBtn = styled(PaperClipOutlined)`
   font-size : 40px;
@@ -54,6 +66,11 @@ const PageBtn = styled(PaperClipOutlined)`
   /* box-shadow : 3px 3px 10px #777; */
   filter : drop-shadow( 3px 3px 10px #777);
   color : #2085a1c7;
+  &:hover {
+    color : #cf934ed7;
+    transition : color 0.4s;
+  }
+  transition : color 0.4s;
 `
 
 const ColStyled = styled(Col)`
@@ -147,7 +164,7 @@ const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
       {CoverUp && <FullDiv onClick={clickCoverUp}/> }
         {/* <LoginForm/> */}
     <RowStyled onClick={clickCoverUp} justify="space-between" align="middle">
-      <Col xs={24} md={3}  span={4}>
+      <Col xs={24} md={3}>
       </Col>
       <ColStyled onScroll={onScrollHandler} xs={24} md={18} span={4}>
       {!queryname && (!resposinveSmall ? <TagBtn onClick={clickTag}/> : <TagBtn onClick={clickTag} style={LeftBtn}/>)}

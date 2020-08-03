@@ -15,6 +15,7 @@ const CenterdDiv = styled.div`
     width : 100%;
     display : flex;
     justify-content : center;
+    align-items : flex-end;
 `
 
 const HashText = styled(Typography.Text)`
@@ -32,32 +33,61 @@ const fetcher = (url) => axios.get(url, { withCredentials: true })
     .then((result) => result.data);
 
 const HashtagSearch = () => {
-    const { data, error } = useSWR(`http://localhost:3055/hashtag`, fetcher);
-    const { PostsData, tagName,  } = useSelector((state) => state.post)
-    const [strongText, setStrongText] = useState('')
-    const dispatch = useDispatch();
-
-    const searchHashtag = useCallback((tag) => () => {
-         tagName !== tag && dispatch({
-            type : HASHTAG_SEARCH_REQUEST,
-            data : {
-                name : encodeURIComponent(tag)
-            }
-        })
-    },[tagName])
-    
-    useEffect(() =>{
-        setStrongText(tagName)
-    },[tagName])
+    const { data : HashTags, error } = useSWR(`http://localhost:3055/hashtag`, fetcher);
 
     return (
         <CenterdDiv>
         <CenterDiv>
-        {data?.map(v => {
-     return (<HashText  style={{fontSize : (v?.Posts?.length * 1.25 + 10.5) > 100 ? 100 : (v?.Posts?.length * 1.25 + 10.5), color : strongText === v?.name && 'black'}} onClick={searchHashtag(v?.name)}>{v?.name}</HashText>)
-            })}
+        {HashTags?.map(hashtag => <HashtagText hashtag={hashtag}/>)}
         </CenterDiv>
         </CenterdDiv>
+    )
+}
+
+
+const HashtagText = ({ hashtag }) => {
+    const { tagName } = useSelector((state) => state.post)
+    const [strongText, setStrongText] = useState('')
+    const dispatch = useDispatch();
+
+    const searchHashtag = useCallback((tag) => () => {
+        tagName !== tag && dispatch({
+           type : HASHTAG_SEARCH_REQUEST,
+           data : {
+               name : encodeURIComponent(tag)
+           }
+       })
+   },[tagName])
+   
+   useEffect(() =>{
+       setStrongText(tagName)
+   },[tagName])
+
+    const fontStyleMemo = useMemo(() => {
+        if(hashtag?.Posts?.length * 1.15 + 10.5 > 100) {
+            if(strongText === hashtag?.name) {
+                return { 
+                    color : 'black', 
+                    fontSize : 100,
+                }
+            }
+            return { 
+                fontSize : 100, 
+            }
+        }
+        if(hashtag?.Posts?.length * 1.15 + 10.5 < 100) {
+            if(strongText === hashtag?.name) {
+                return { 
+                    color : 'black', 
+                    fontSize : hashtag?.Posts?.length * 1.15 + 10.5,
+                }
+            }
+            return { fontSize : hashtag?.Posts?.length * 1.15 + 10.5 }
+        }
+    },[hashtag, strongText])
+
+    return (
+<HashText style={fontStyleMemo} onClick={searchHashtag(hashtag?.name)}>{hashtag?.name}</HashText>
     )
 }
 

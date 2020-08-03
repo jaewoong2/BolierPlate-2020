@@ -3,6 +3,8 @@ import styled from 'styled-components'
 import Link from 'next/link'
 import { message } from 'antd'
 import { EyeOutlined, HeartTwoTone } from '@ant-design/icons'
+import { useDispatch } from 'react-redux'
+import { LIKE_POST_REQUEST, UNLIKE_POST_REQUEST } from '../../reducer/post'
 
 const DivWrapper = styled.div`
 display : flex;
@@ -63,9 +65,8 @@ span {
 
 
 const PostCardHeader = ({ postData, loginInfo, Liker, index }) => {
+  const dispatch = useDispatch();
 
-
-        
 const onClickLike = useCallback(() => {
     if(!loginInfo.id) {
       return message.warn('로그인 후 이용 가능합니다')

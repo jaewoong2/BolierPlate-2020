@@ -6,6 +6,7 @@ import useStyle from '../../Hooks/useStyle'
 import { useSelector, useDispatch } from 'react-redux'
 import { LOG_IN_REQUEST } from '../../reducer/user'
 import ModalForm from '../ModalForm'
+import InputCustom from './InputCustom'
 
 const StyledDivForInputWrapper = styled.div`
     display : flex;
@@ -13,49 +14,7 @@ const StyledDivForInputWrapper = styled.div`
     justify-content : center;
     align-items : center;
     background-color : inherit;
-
-    .inputWrapper {
-        display : flex;
-        align-items : center;
-        justify-content : center;
-        margin-top : 5px;
-        border : 0;
-        border-bottom : 1px solid #d9d9d9;
-
-        input {
-            margin-left : 10px;
-            border : 0;
-            background-color : inherit;
-            font-size : 0.95rem;
-            width : 80vw;
-            max-width : 350px;
-            height : 40px;
-            color : black;
-        
-            &:focus {
-                outline : 0;
-                color : black;
-            }
-        }
-
-        &:focus-within {
-            /* background-color : red; */
-                outline : 0;
-                border : 0;
-                border-bottom : 1px solid #638bf7;
-                color : #4472f1;
-                transition : color 0.2s, border-bottom 0.2s;
-                box-shadow : 0px 0.5px 0.3px #638bf7ee;
-            }
-        &:hover{
-                outline : 0;
-                border : 0;
-                border-bottom : 1px solid #2a60f3;
-                color : #4472f1;
-                transition : color 0.2s, border-bottom 0.2s;
-        }
-
-    }
+    
             .login {
                 display : flex;
                 justify-content : space-between;
@@ -146,21 +105,28 @@ const LoginForm = ({ setVisible : LoginFinish }) => {
 },[email, password])
 
 
+
+
+
     return (
         <StyledDivForInputWrapper>
             <div>
                 <form autoComplete="on" onSubmit={onFinish}>
-            <div className="inputWrapper">
-            <UserOutlined/>
-            <input name="email" type="email" required value={email || ''} onChange={onChangeEmail} placeholder="이메일" />
-            <div onClick={onClickCancelBtn(email)} className={email ? 'cancelBtn' : 'hidden'}>X</div>
-            </div>
+            <InputCustom 
+            icon={<UserOutlined/>} 
+            name={"email"} 
+            value={email} 
+            onChange={onChangeEmail} 
+            suffix={<div onClick={onClickCancelBtn(email)} className={email ? 'cancelBtn' : 'hidden'}>X</div>}
+            placeholder={"이메일"} />
             <div className="error" style={errorMemoEmail}>이메일을 입력해주세요..</div>
-            <div className="inputWrapper">
-            <LockOutlined/>
-            <input value={password|| ''} required onChange={onChangePassword} type="password" placeholder="비밀번호" />
-            <div onClick={onClickCancelBtn(password)} className={password ? 'cancelBtn' : 'hidden'}>X</div>
-            </div>
+             <InputCustom
+            icon={<LockOutlined/>} 
+            name={"password"} 
+            value={password} 
+            onChange={onChangePassword}
+            suffix={<div onClick={onClickCancelBtn(email)} className={email ? 'cancelBtn' : 'hidden'}>X</div>}
+            placeholder={"비밀번호"} />
             <div className="error" style={errorMemoPassword}>비밀번호를 입력해주세요..</div>
             <div className="login">
                 <a href="#" onClick={onClickModal} >회원가입</a>

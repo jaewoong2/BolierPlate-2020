@@ -39,6 +39,14 @@ const SubInfo = styled.div`
    margin-right : 4px;
   }
 
+  .tool {    
+    &:hover {
+      cursor: pointer;
+      transform : rotate(45deg); 
+      color : #ad0303bd;
+      transition : transform 0.4s, color 0.4s;
+    }
+  }
 `;
 
 const AvartarStyle = styled(Avatar)`
@@ -46,7 +54,6 @@ const AvartarStyle = styled(Avatar)`
     margin-right: 5px; 
     overflow : hidden ;
 `
-
 
 const PostCardSubInfo = ({ postData, loginInfo,  }) => {
     const { deletePostLoading, CoverUp, CoverUserId } = useCallback((state) => state.post);
@@ -97,7 +104,7 @@ const PostCardSubInfo = ({ postData, loginInfo,  }) => {
     <Menu.Item onClick={deletePost}>삭제</Menu.Item>
     </Menu>
 }>
-  <ToolOutlined rotate={-90} size={14}/>
+  <ToolOutlined className="tool" rotate={-90} size={6}/>
   </Dropdown>
    : ''}
    </span>
