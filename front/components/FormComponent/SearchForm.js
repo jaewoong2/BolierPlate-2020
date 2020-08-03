@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import InputCustom from './InputCustom'
 import UseInput from '../../Hooks/UseInput'
 import styled from 'styled-components'
-
+import useSWR from 'swr'
+import axios from 'axios';
+import { useDispatch } from 'react-redux'
+import { SEARCH_POSTS_REQUEST } from '../../reducer/post'
+import ResultView from './ResultView'
 const StyleDivForWrapper = styled.div`
     display : flex;
     width : 100%;
@@ -44,12 +48,29 @@ const StyledSelect = styled.select`
     }
 `
 
-const SearchForm = () => {
+const SearchForm = () => {    
+    const dispatch = useDispatch();
     const [search, setSearch, onChangeSearch] = UseInput(undefined);
     const [select, setSelect, onChangeSelect] = UseInput('제목');
 
+    useEffect(() => {
+        select &&
+        search && dispatch({
+            type : SEARCH_POSTS_REQUEST,
+            data : {
+                serchName : encodeURIComponent(select),
+                search : encodeURIComponent(search)
+            }
+        })
+    },[search, select])
+
     return (
+        <>
         <StyleDivForWrapper>
+        <div>
+        <div style={{ width : "100%", paddingLeft : '60px', backgroundColor : 'white', border : '1px solid black'}}>
+        <ResultView/>
+        </div>
         <InputCustom
             icon={<StyledSelect  value={select} onChange={onChangeSelect}>
                 <option value="제목">제목</option>
@@ -59,9 +80,11 @@ const SearchForm = () => {
             value={search}
             onChange={onChangeSearch}
             placeholder={`${select}검색...`}
-            suffix={<div className="btn">검색</div>}
-        />
+            suffix={<div  className="btn">검색</div>}
+            />
+        </div>
         </StyleDivForWrapper>
+        </>
     )
 }
 

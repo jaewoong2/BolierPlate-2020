@@ -46,6 +46,37 @@ router.get('/', removeHtmlAndShorten, async (req, res, next) => {
     }
 })
 
+router.get('/:search',async (req, res, next) => {
+    try {
+        const search = decodeURIComponent(req.params.search);
+        const select = decodeURIComponent(req.query.searchName);
+        const where = {};
+        
+        console.log(search, select)
+
+        if(select === '제목') {
+            where.title = {[Op.like] : `%${search}%`};
+        }
+        if(select === '내용') {
+            where.content = {[Op.like] : `%${search}%`};
+        }
+        const posts = await Post.findAll({
+            where,
+            order : [['createdAt', "DESC"]],
+            include : [{
+                model : Hashtag  
+            }]
+        })
+        if(!posts) {
+            return res.status(403).send('존재하지 않는 게시물...')
+        }
+
+        res.status(201).json(posts)
+    } catch (err) {
+        console.error(err)
+        next(err)
+    }
+})
 
 
 router.get('/pagenation', removeHtmlAndShorten, async (req, res, next) => {

@@ -1,6 +1,6 @@
 import { takeLatest, call, fork, all, put, throttle, delay } from "redux-saga/effects"
 import axios from 'axios';
-import { WRTIE_SUCCESS, WRTIE_FAILURE, WRTIE_REQUEST, LOAD_MYPOST_REQUEST, LOAD_MYPOST_SUCCESS, LOAD_MYPOST_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_SUCCESS, DELETE_POST_REQUEST, DELETE_POST_SUCCESS, DELETE_POST_FAILURE, HASHTAG_SEARCH_REQUEST, HASHTAG_SEARCH_SUCCESS, HASHTAG_SEARCH_FAILURE, LOAD_POSTS_REQUEST, LOAD_POSTS_SUCCESS, LOAD_POSTS_FAILURE, COVER_POST, SUBMIT_COMMENT_REQUEST, SUBMIT_COMMENT_SUCCESS, SUBMIT_COMMENT_FAILURE, LOAD_ONE_POST_REQUEST, LOAD_ONE_POST_SUCCESS, LOAD_ONE_POST_FAILURE, DELETE_COMMENT_REQUEST, DELETE_COMMENT_FAILURE, DELETE_COMMENT_SUCCESS, LIKE_POST_REQUEST, LIKE_POST_FAILURE, LIKE_POST_SUCCESS, UNLIKE_POST_REQUEST, UNLIKE_POST_FAILURE, UNLIKE_POST_SUCCESS } from "../reducer/post";
+import { WRTIE_SUCCESS, WRTIE_FAILURE, WRTIE_REQUEST, LOAD_MYPOST_REQUEST, LOAD_MYPOST_SUCCESS, LOAD_MYPOST_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_SUCCESS, DELETE_POST_REQUEST, DELETE_POST_SUCCESS, DELETE_POST_FAILURE, HASHTAG_SEARCH_REQUEST, HASHTAG_SEARCH_SUCCESS, HASHTAG_SEARCH_FAILURE, LOAD_POSTS_REQUEST, LOAD_POSTS_SUCCESS, LOAD_POSTS_FAILURE, COVER_POST, SUBMIT_COMMENT_REQUEST, SUBMIT_COMMENT_SUCCESS, SUBMIT_COMMENT_FAILURE, LOAD_ONE_POST_REQUEST, LOAD_ONE_POST_SUCCESS, LOAD_ONE_POST_FAILURE, DELETE_COMMENT_REQUEST, DELETE_COMMENT_FAILURE, DELETE_COMMENT_SUCCESS, LIKE_POST_REQUEST, LIKE_POST_FAILURE, LIKE_POST_SUCCESS, UNLIKE_POST_REQUEST, UNLIKE_POST_FAILURE, UNLIKE_POST_SUCCESS, SEARCH_POSTS_SUCCESS, SEARCH_POSTS_FAILURE, SEARCH_POSTS_REQUEST } from "../reducer/post";
 
 
 // 글쓰기
@@ -289,6 +289,32 @@ function* watchCoverUp() {
 }
 
 
+function searchPostsAPI(data, selcet) {
+    return axios.get(`/posts/${data}?searchName=${selcet}`)
+}
+
+function* searchPosts(action) {
+    try {  
+        const result = yield call(searchPostsAPI, action.data.search, action.data.serchName)
+        yield put({
+            type : SEARCH_POSTS_SUCCESS,
+            data : result.data,
+            search : decodeURIComponent(action.data.search),
+        })
+        
+    } catch(err) {
+        console.error(err)
+        yield put({
+            type : SEARCH_POSTS_FAILURE,
+            error : err.response.data
+        })
+    }
+}
+
+function* watchSearchPosts() {
+    yield throttle(2000 ,SEARCH_POSTS_REQUEST, searchPosts);
+}
+
 
 export default function* postSaga() {
     yield all([
@@ -302,6 +328,7 @@ export default function* postSaga() {
         fork(watchLoadOnePost),
         fork(watchDeleteCommit),
         fork(watchLikePost),
-        fork(watchUnLikePost)
+        fork(watchUnLikePost),
+        fork(watchSearchPosts)
     ])
 }

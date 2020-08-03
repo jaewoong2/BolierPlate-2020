@@ -40,8 +40,14 @@ const initialState = {
   CoverUserId : null,
   CoverUp : false,
   CoverUpLoading : false,
-  
+
+  searchPostsLoading : true,
+  searchPostsDone : false,
+  searchPostsError : null,
+ 
   tagName: "",
+  searchName : "",
+  serach : [],
   ImagePaths: [],
   PostsData: [],
   onePost: {},
@@ -92,6 +98,9 @@ export const UNLIKE_POST_REQUEST = "UNLIKE_POST_REQUEST";
 export const UNLIKE_POST_SUCCESS = "UNLIKE_POST_SUCCESS";
 export const UNLIKE_POST_FAILURE = "UNLIKE_POST_FAILURE";
 
+export const SEARCH_POSTS_SUCCESS = 'SEARCH_POSTS_SUCCESS';
+export const SEARCH_POSTS_FAILURE = 'SEARCH_POSTS_FAILURE';
+export const SEARCH_POSTS_REQUEST = 'SEARCH_POSTS_REQUEST';
 
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
@@ -201,6 +210,25 @@ const reducer = (state = initialState, action) => {
         draft.hashtagSearchDone = true;
         draft.hashtagSearchError = action.error;
         break;
+
+        case SEARCH_POSTS_REQUEST:
+          draft.searchPostsLoading = true;
+          draft.searchPostsDone = false;
+          draft.searchPostsError = null;
+          break;
+
+        case SEARCH_POSTS_SUCCESS:
+          draft.searchPostsLoading = false;
+          draft.searchPostsDone = true;
+          draft.search = action.data;
+          draft.searchName = action.search;
+          break;
+  
+        case SEARCH_POSTS_FAILURE:
+          draft.searchPostsLoading = false;
+          draft.searchPostsDone = true;
+          draft.searchPostsError = action.error;
+          break;
 
         case SUBMIT_COMMENT_REQUEST:
           draft.submitCommentLoading = true;

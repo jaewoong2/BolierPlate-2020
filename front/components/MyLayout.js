@@ -12,6 +12,7 @@ import ModalForm from './ModalForm';
 import PageNation from './PageNation/PageNation';
 import Infomation from './Infomation/Infomation';
 import LoginForm from './FormComponent/LoginForm';
+import SearchForm from './FormComponent/SearchForm';
 
 const FullDiv = styled.div`
 background-color : #ffffff9d;
@@ -176,6 +177,7 @@ const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
       </ColStyled>
       <Col xs={24} md={3}  span={4}>
       </Col>
+    <SearchForm/>
     </RowStyled>
         {page && (resposinveSmall ? <PageNation resSmall={true}/> : <PageNation/>)}
     <Dropdown placement="topLeft" overlay={<Text code>Write</Text>}>
