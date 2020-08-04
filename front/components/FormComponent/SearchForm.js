@@ -18,6 +18,7 @@ const StyleDivForWrapper = styled.div`
 
     .wrapper {
         margin-top : 0;
+        border : 0;
     }
 
     .btn {
@@ -42,7 +43,7 @@ const StyleDivForWrapper = styled.div`
         margin-left : 55px; 
         background-color : white;
         border-radius : 0 8px 0 0;
-        border-left : 7px solid #3986ebd7;
+        border-left : 5px solid #3986ebd7;
         box-shadow : 4px 3px 7px #777, -3px -3px 7px #777;
     }
 `
@@ -85,11 +86,7 @@ const SearchForm = () => {
     useEffect(() => {
         searchName === "" && setSearch(undefined)
     },[searchName])
-
     
-
-
-
     return (
         <>
         <StyleDivForWrapper>
@@ -105,7 +102,6 @@ const SearchForm = () => {
             value={search}
             onChange={onChangeSearch}
             placeholder={`${select}검색...`}
-            suffix={<div  className="btn">검색</div>}
             />
         </div>
         </StyleDivForWrapper>

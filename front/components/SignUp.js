@@ -38,14 +38,10 @@ const tailFormItemLayout = {
 const SignUp = ({ setVisible }) => {
     const [form] = Form.useForm();
     const dispatch = useDispatch();
+
     const [register, setRegister] = useState(false);
     const { registerUserLoading, registerUserDone } = useSelector(state => state.user);
-
-    // useEffect(() => {
-    //     !registerUserLoading && registerUserDone && setVisible(false)
-    //     registerUserDone && !registerUserLoading && message.info('회원가입 성공')
-    //   },[registerUserLoading, registerUserDone])
-      
+    
     const onFinish = useCallback((values) => {
         dispatch({
             type : REGISTER_USER_REQUEST,

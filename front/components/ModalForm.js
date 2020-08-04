@@ -4,6 +4,8 @@ import { Modal, message } from 'antd'
 import SignUp from './SignUp'
 import { useSelector } from 'react-redux'
 import LoginForm from './FormComponent/LoginForm'
+import SignUpForm from './FormComponent/SignUpForm'
+
 
 const ModalForm = ({ visible, setting, setVisible }) => {
     const { loginLoading, loginDone  } = useSelector(state => state.user)
@@ -20,7 +22,7 @@ const ModalForm = ({ visible, setting, setVisible }) => {
           setVisible(false)
         },[loginLoading, loginDone])}
       >
-        {setting === 'Login' ? <LoginForm setVisible={setVisible}/> : <SignUp setVisible={setVisible}/>}
+        {setting === 'Login' ? <LoginForm setVisible={setVisible}/> : <SignUpForm setVisible={setVisible}/>}
       </Modal>
     )
 }

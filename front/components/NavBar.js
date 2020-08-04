@@ -168,7 +168,10 @@ const FullDIv = useMemo(() => {
             </div>
           </Popover>
       </StyledMenuForInputSearch>
-      <SubMenu style={SubMenuFloatRigth} icon={loginInfo?.Images ? <StyledImageForMenu src={`http://localhost:3055/${loginInfo?.Images[0]?.src}`}/> : <MenuOutlined /> }>
+      <SubMenu style={SubMenuFloatRigth} 
+      icon={loginInfo?.Images && loginInfo?.Images[0] ?
+         <StyledImageForMenu src={`http://localhost:3055/${loginInfo?.Images[0]?.src}`}/> 
+      : <MenuOutlined /> }>
         {!loginInfo?.email ? (
       <Menu.ItemGroup title={null}>
             <Menu.Item onClick={onModalLogin} key="setting:1">로그인</Menu.Item>

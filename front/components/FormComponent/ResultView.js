@@ -20,6 +20,7 @@ const StyledDiv = styled.div`
         padding-bottom : 5px;
         display : flex;
         justify-content : space-between;
+        margin-bottom : 5px;
 
         &:hover {
            background-color : #807d7d9c;
@@ -35,6 +36,7 @@ const StyledDiv = styled.div`
 
         span {
             font-style : italic;
+            margin-right : 5px;
         }
     }
 

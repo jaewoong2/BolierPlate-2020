@@ -4,7 +4,7 @@ import { UserOutlined, LockOutlined, NodeExpandOutlined, LoadingOutlined, UserAd
 import UseInput from '../../Hooks/UseInput'
 import useStyle from '../../Hooks/useStyle'
 import { useSelector, useDispatch } from 'react-redux'
-import { LOG_IN_REQUEST } from '../../reducer/user'
+import { LOG_IN_REQUEST, REGISTER_USER_REQUEST } from '../../reducer/user'
 import ModalForm from '../ModalForm'
 import InputCustom from './InputCustom'
 
@@ -62,11 +62,11 @@ const StyledDivForInputWrapper = styled.div`
             }
 `
 
-const SignUp = () => {
-    const { registerUserLoading, registerUserDone, registerUserError } = useSelector(state => state.user);
+const SignUpForm = () => {
+    const { loginInfo, registerUserLoading, registerUserDone, registerUserError } = useSelector(state => state.user);
     const [register, setRegister] = useState(false);
     const [watch, setWatch] = useState(true);
-    const [watchConfrim, setWatchConfrim] = useState(true); 
+    const [watchConfirm, setWatchConfirm] = useState(true); 
 
     const dispatch = useDispatch();
     
@@ -78,23 +78,29 @@ const SignUp = () => {
     const errorMemoEmail = useStyle(email);
     const errorMemoPassword = useStyle(password);
     const errorMemoPasswordConfirm = useStyle(passwordConfirm);
+    const errorMemoPasswordConfirmWrong = useStyle(password === passwordConfirm);
     const errorMemoNickName = useStyle(nickname);
 
     useEffect(() => {
       if(loginInfo?.email) {
         return <div>로그인 되어있습니다.</div>
     }
-    },[])
+    },[loginInfo])
   
 
-const onFinish = useCallback((values) => {
+const onFinish = useCallback(() => {
     dispatch({
         type : REGISTER_USER_REQUEST,
-        data : values
+        data : {
+            email : email,
+            password : password,
+            nickname : nickname
+        }
     })
     setRegister(true)
-    
-}, []);
+}, [email,
+    password,
+    nickname]);
 
 useEffect(() => {
     register && !registerUserLoading && setVisible(false)
@@ -104,9 +110,13 @@ useEffect(() => {
 
 const onClickWatch = useCallback((value) => () => {
     value === 'watch' && setWatch(prev => !prev)
-    value === 'watchConfrim' && setWatchConfrim(prev => !prev)
+    value === 'watchConfirm' && setWatchConfirm(prev => !prev)
 },[])
 
+const onClickCancelBtn = useCallback((value) => () => {
+    value === email && setEmail(undefined);
+    value === nickname && setNickname(undefined);
+},[email, nickname])
 
     return (
         <StyledDivForInputWrapper>
@@ -128,7 +138,7 @@ const onClickWatch = useCallback((value) => () => {
             value={password}
             onChange={onChangePassword}
             suffix={
-            <div onClick={onClickWatch('watch')} className={email ? 'cancelBtn' : 'hidden'}>
+            <div onClick={onClickWatch('watch')} className={password ? 'cancelBtn' : 'hidden'}>
                {watch ? <EyeOutlined/> : <EyeInvisibleOutlined/>}
             </div>}
             placeholder={"비밀번호"} />
@@ -136,14 +146,25 @@ const onClickWatch = useCallback((value) => () => {
 
             <InputCustom
             icon={<KeyOutlined/>} 
-            name={watchConfrim && "password"} 
+            name={watchConfirm && "password"} 
             value={passwordConfirm} 
-            onChange={onChangePassword}
-            suffix={<div onClick={onClickWatch('watchConfirm')} className={email ? 'cancelBtn' : 'hidden'}>
-               {watchConfrim ? <EyeOutlined/> : <EyeInvisibleOutlined/>}
+            onChange={onChangePasswordConfirm}
+            suffix={<div onClick={onClickWatch('watchConfirm')} className={passwordConfirm ? 'cancelBtn' : 'hidden'}>
+               {watchConfirm ? <EyeOutlined/> : <EyeInvisibleOutlined/>}
                 </div>}
-            placeholder={"비밀번호"} />
-            <div className="error" style={errorMemoPassword}>비밀번호를 입력해주세요..</div>
+            placeholder={"비밀번호 확인"} />
+            {passwordConfirm && passwordConfirm !== password ? 
+            <div className="error" style={errorMemoPasswordConfirmWrong}>비밀번호가 틀렸습니다..</div>:
+            <div className="error" style={errorMemoPasswordConfirm}>비밀번호를 확인해주세요..</div>
+            } 
+            <InputCustom 
+            icon={<UserAddOutlined/>} 
+            name={"nickname"} 
+            value={nickname} 
+            onChange={onChangeNickname} 
+            suffix={<div onClick={onClickCancelBtn(nickname)} className={nickname ? 'cancelBtn' : 'hidden'}>X</div>}
+            placeholder={"닉네임"} />
+            <div className="error" style={errorMemoNickName}>닉네임을 입력해주세요..</div>
 
             
             <div className="login">
@@ -151,10 +172,9 @@ const onClickWatch = useCallback((value) => () => {
             </div>
             {<div className="errormessage">{registerUserError}</div>}
                 </form>
-                <ModalForm setting='SignUp' visible={visible} setVisible={setVisible}/>
             </div>                
         </StyledDivForInputWrapper>
     )
 }
 
-export default SignUp
+export default SignUpForm
