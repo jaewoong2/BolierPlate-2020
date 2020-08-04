@@ -4,7 +4,7 @@ import UseInput from '../../Hooks/UseInput'
 import styled from 'styled-components'
 import useSWR from 'swr'
 import axios from 'axios';
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { SEARCH_POSTS_REQUEST } from '../../reducer/post'
 import ResultView from './ResultView'
 const StyleDivForWrapper = styled.div`
@@ -15,6 +15,10 @@ const StyleDivForWrapper = styled.div`
     background-color : #ffffff00;
     position : fixed;
     bottom : 5vh;
+
+    .wrapper {
+        margin-top : 0;
+    }
 
     .btn {
         background-color : #066ef7d7;
@@ -31,6 +35,15 @@ const StyleDivForWrapper = styled.div`
             cursor : pointer;
             transition : background-color 0.4s;
         }
+    }
+
+    .resultWrapper{
+        width : 78%; 
+        margin-left : 55px; 
+        background-color : white;
+        border-radius : 0 8px 0 0;
+        border-left : 7px solid #3986ebd7;
+        box-shadow : 4px 3px 7px #777, -3px -3px 7px #777;
     }
 `
 
@@ -49,6 +62,7 @@ const StyledSelect = styled.select`
 `
 
 const SearchForm = () => {    
+    const { searchName } = useSelector(state => state.post);
     const dispatch = useDispatch();
     const [search, setSearch, onChangeSearch] = UseInput(undefined);
     const [select, setSelect, onChangeSelect] = UseInput('제목');
@@ -62,13 +76,25 @@ const SearchForm = () => {
                 search : encodeURIComponent(search)
             }
         })
+        !search && dispatch({
+            type : SEARCH_POSTS_REQUEST,
+            data : { searchName : null, search : null }
+        })
     },[search, select])
+
+    useEffect(() => {
+        searchName === "" && setSearch(undefined)
+    },[searchName])
+
+    
+
+
 
     return (
         <>
         <StyleDivForWrapper>
         <div>
-        <div style={{ width : "100%", paddingLeft : '60px', backgroundColor : 'white', border : '1px solid black'}}>
+        <div className="resultWrapper">
         <ResultView/>
         </div>
         <InputCustom
@@ -76,7 +102,6 @@ const SearchForm = () => {
                 <option value="제목">제목</option>
                 <option value="내용">내용</option>
                 </StyledSelect>}
-            name="search"
             value={search}
             onChange={onChangeSearch}
             placeholder={`${select}검색...`}

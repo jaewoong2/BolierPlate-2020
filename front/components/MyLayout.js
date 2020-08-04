@@ -6,7 +6,7 @@ import Editor from './Edit/Editor';
 import { EditOutlined, HeartFilled, StarOutlined, StarFilled, TagsOutlined, PaperClipOutlined } from '@ant-design/icons';
 import Text from 'antd/lib/typography/Text';
 import Router, { useRouter } from 'next/router';
-import { TOGGLE_TAG, PAGE_NATION_TOGGLE, COVER_POST } from '../reducer/post';
+import { TOGGLE_TAG, PAGE_NATION_TOGGLE, COVER_POST, SEARCH_POSTS_FAILURE } from '../reducer/post';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalForm from './ModalForm';
 import PageNation from './PageNation/PageNation';
@@ -15,13 +15,13 @@ import LoginForm from './FormComponent/LoginForm';
 import SearchForm from './FormComponent/SearchForm';
 
 const FullDiv = styled.div`
-background-color : #ffffff9d;
+/* background-color : #ffffff9d;
 width : 100vw;
 height : 100vh;
 z-index : 4;
-position : fixed;
-
+position : fixed; */
 `
+
 const EditBtn = styled(StarFilled)`
 /* border-radius : 50%;
   width : 40px;
@@ -159,15 +159,21 @@ const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
   }
 },[loginInfo])
 
+const onClickSearchDown = useCallback(() => {
+  dispatch({
+    type : SEARCH_POSTS_FAILURE,
+    error : '다른부분 클릭'
+  })
+},[])
+
 
     return (
       <>
-      {CoverUp && <FullDiv onClick={clickCoverUp}/> }
         {/* <LoginForm/> */}
-    <RowStyled onClick={clickCoverUp} justify="space-between" align="middle">
+    <RowStyled onClickCapture={onClickSearchDown} onClick={clickCoverUp} justify="space-between" align="middle">
       <Col xs={24} md={3}>
       </Col>
-      <ColStyled onScroll={onScrollHandler} xs={24} md={18} span={4}>
+      <ColStyled onClick={onClickSearchDown} onScroll={onScrollHandler} xs={24} md={18} span={4}>
       {!queryname && (!resposinveSmall ? <TagBtn onClick={clickTag}/> : <TagBtn onClick={clickTag} style={LeftBtn}/>)}
       {!queryname && (!resposinveSmall ? <PageBtn onClick={clickPageNation}/> : <PageBtn onClick={clickPageNation} style={responsiveSmallBtn}/>)}
       <NavBar />
@@ -177,8 +183,8 @@ const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
       </ColStyled>
       <Col xs={24} md={3}  span={4}>
       </Col>
-    <SearchForm/>
     </RowStyled>
+    <SearchForm/>
         {page && (resposinveSmall ? <PageNation resSmall={true}/> : <PageNation/>)}
     <Dropdown placement="topLeft" overlay={<Text code>Write</Text>}>
     {queryname !== 'write' ? (!resposinveSmall ? <EditBtn onClick={onClickWriteBtn}/> : <EditBtn onClick={onClickWriteBtn} style={responsiveSmallBtn}/>) : <div></div>}

@@ -228,6 +228,8 @@ const reducer = (state = initialState, action) => {
           draft.searchPostsLoading = false;
           draft.searchPostsDone = true;
           draft.searchPostsError = action.error;
+          draft.search = [];
+          draft.searchName = '';
           break;
 
         case SUBMIT_COMMENT_REQUEST:

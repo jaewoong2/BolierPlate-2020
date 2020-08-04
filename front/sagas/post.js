@@ -295,13 +295,19 @@ function searchPostsAPI(data, selcet) {
 
 function* searchPosts(action) {
     try {  
+        console.log(action.data.search)
+        if(!action.data.search) {
+          return yield put({
+                type : SEARCH_POSTS_FAILURE,
+                error : '빈칸은 검색이 안되요'
+            })
+        }
         const result = yield call(searchPostsAPI, action.data.search, action.data.serchName)
         yield put({
             type : SEARCH_POSTS_SUCCESS,
             data : result.data,
             search : decodeURIComponent(action.data.search),
         })
-        
     } catch(err) {
         console.error(err)
         yield put({

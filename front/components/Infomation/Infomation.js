@@ -13,10 +13,9 @@ const StyledDivForWrapperFlex = styled(Row)`
         display : flex;
         justify-content : center;
         align-items : flex-end;
-        background-color : yellow;
         transition : height 0.4s ease-in;
-       
     `
+
 const StyledDivForContent = styled(Col)`
     display : flex;
     justify-content : center;
@@ -29,10 +28,9 @@ const StyledDivForContent = styled(Col)`
     border-bottom : 0;
     box-shadow : -2px -2px 7px #777, 2px 2px 2px #777; 
     border-radius : 50px 50px 0px 0px;
-    z-index : 5;
+    z-index : 3;
     transition : height 0.4s ease-in;
-
-
+    visibility : hidden;
 `
 
 
@@ -49,6 +47,7 @@ const Infomation = () => {
         })
         CoverUp && setNormal({
             height : '70%',
+            visibility : 'visible',
             })
     },[CoverUp])
 
@@ -65,7 +64,7 @@ const Infomation = () => {
             {CoverUp && CoverUserId &&<InfomationContnet />}
             </StyledDivForContent>
         </StyledDivForWrapperFlex>
-            </>
+        </>
     )
 }
 

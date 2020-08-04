@@ -52,7 +52,9 @@ router.get('/:search',async (req, res, next) => {
         const select = decodeURIComponent(req.query.searchName);
         const where = {};
         
-        console.log(search, select)
+        if(!search.trim()) {
+            return res.status(403).send('빈칸은 검색이 안되요')
+        }
 
         if(select === '제목') {
             where.title = {[Op.like] : `%${search}%`};

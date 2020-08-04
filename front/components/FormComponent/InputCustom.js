@@ -48,7 +48,7 @@ const InputCustom = ({icon, name, placeholder, value, onChange, suffix}) => {
 
 
     return (
-        <InputWrapper>
+        <InputWrapper className="wrapper">
             {icon}
             <input className="input" name={name} type={name} required value={value || ''} onChange={onChange} placeholder={placeholder}/>
             {suffix}
