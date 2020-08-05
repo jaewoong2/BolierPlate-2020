@@ -14,13 +14,15 @@ import Infomation from './Infomation/Infomation';
 import LoginForm from './FormComponent/LoginForm';
 import SearchForm from './FormComponent/SearchForm';
 
-const FullDiv = styled.div`
-/* background-color : #ffffff9d;
-width : 100vw;
-height : 100vh;
-z-index : 4;
-position : fixed; */
-`
+// const FullDiv = styled.div`
+// background-color : #ffffff9d;
+// width : 100vw;
+// height : 100vh;
+// z-index : 3;
+// position : fixed;
+// backdrop-filter: blur(4px);
+// -webkit-backdrop-filter: blur(4px);
+// `
 
 const EditBtn = styled(StarFilled)`
 /* border-radius : 50%;
@@ -169,7 +171,7 @@ const onClickSearchDown = useCallback(() => {
 
     return (
       <>
-        {/* <LoginForm/> */}
+        {/* {CoverUp && <FullDiv onClick={clickCoverUp}  />} */}
     <RowStyled onClickCapture={onClickSearchDown} onClick={clickCoverUp} justify="space-between" align="middle">
       <Col xs={24} md={3}>
       </Col>

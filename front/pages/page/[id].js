@@ -69,7 +69,6 @@ const DivContainer = styled.div`
     justify-content : flex-end;
     padding-left : 5%;
     padding-right : 5%;
-
     p {
         &:hover {
             cursor : pointer;
@@ -301,6 +300,8 @@ const divEditContainerMemo = useMemo(() => {
 
     return (
         <MyLayout>
+
+
            {data?.id ? <div onClick={onClickCoverDown}>
             <Containertitle><h1>{data?.title}</h1></Containertitle>
             <DivContainer>
@@ -328,6 +329,8 @@ const divEditContainerMemo = useMemo(() => {
                 <EyeOutlined className="viewicon"/>
                 <span>{data?.Views?.length}</span>
                 </ViewDiv>
+
+
                 <LikeDiv>
                 <HeartTwoTone onClick={onClickLike} className="heart" twoToneColor={liker?.id ? 'red' : 'gray'} />
                 <span>{data?.Likers?.length}</span>
