@@ -13,7 +13,7 @@ const StyledDivForWrapperFlex = styled(Row)`
         display : flex;
         justify-content : center;
         align-items : flex-end;
-        transition : height 0.4s ease-in;
+        transition : height 0.4s ease-in, visibility 0.4s;
     `
 
 const StyledDivForContent = styled(Col)`
@@ -29,7 +29,7 @@ const StyledDivForContent = styled(Col)`
     box-shadow : -2px -2px 7px #777, 2px 2px 2px #777; 
     border-radius : 50px 50px 0px 0px;
     z-index : 3;
-    transition : height 0.4s ease-in;
+    transition : height 0.4s ease-in, visibility 0.4s;
     visibility : hidden;
 `
 
@@ -43,10 +43,13 @@ const Infomation = () => {
     useEffect(() => {
         !CoverUp && setNormal({
             height : 0,
+            transition : 'height 0.4s ease-in, visibility 0.4s',
+            visibility : 'hidden',
             border : 0,
         })
         CoverUp && setNormal({
-            height : '70%',
+            height : '70%',            
+            transition : 'height 0.4s ease-in, visibility 0.4s',
             visibility : 'visible',
             })
     },[CoverUp])

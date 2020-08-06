@@ -73,7 +73,7 @@ const PageBtn = styled(PaperClipOutlined)`
     color : #cf934ed7;
     transition : color 0.4s;
   }
-  transition : color 0.4s;
+  transition : color 0.4s ;
 `
 
 const ColStyled = styled(Col)`
@@ -99,7 +99,7 @@ const MyLayout = ({ children, onScrollHandler }) => {
     const dispatch = useDispatch();
     const router = useRouter();
     const { loginInfo } = useSelector((state) => state.user);
-    const { CoverUp, CoverUpLoading, PageNation : page } = useSelector((state) => state.post);
+    const { CoverUp, CoverUpLoading, PageNation : page, searchName } = useSelector((state) => state.post);
     const queryname = router.pathname.slice(1);
 
     useEffect(() => {
@@ -162,11 +162,11 @@ const onClickWriteBtn = useCallback(() => { //로그인 안했을 떄.
 },[loginInfo])
 
 const onClickSearchDown = useCallback(() => {
-  dispatch({
+  searchName && dispatch({
     type : SEARCH_POSTS_FAILURE,
     error : '다른부분 클릭'
   })
-},[])
+},[searchName])
 
 
     return (

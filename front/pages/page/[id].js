@@ -15,44 +15,8 @@ import CommentInput from '../../components/Comment/CommentInput';
 import CommentContainer from '../../components/Comment/CommentContainer';
 import { END } from 'redux-saga';
 import wrapper from '../../store/configureStore'
-
-
-const LikeDiv = styled.div`
-    display : flex;
-    margin-top : 10px;
-    margin-right : 5vw;
-
-    .heart {    
-        display : flex;
-        align-items : center;
-        font-size : 17px;
-        margin-left : 5px;
-    }    
-
-    span {
-        margin-right : 10px;
-        font-size : 18px;
-        font-style : italic;
-    }
-`
-const ViewDiv = styled.div`
-    display : flex;
-    margin-top : 10px;
-    margin-left : 3px;
-    align-items : center;
-
-    .viewicon {
-        display : flex;
-        align-items : center;
-        font-size : 17px;
-        margin-left : 5px;
-    }
-    span {
-        font-size : 18px;
-        margin-right : 3px;
-        font-style : italic;
-    }
-`
+import PostPageSubInfo from '../../components/PostPage/PostPageSubInfo';
+import PostPageTagLike from '../../components/PostPage/PostPageTagLike';
 
 const Containertitle = styled.div`
     display : flex;
@@ -61,28 +25,6 @@ const Containertitle = styled.div`
     h1 { 
         font-size : 40px;
         margin : 0;
-    }
-`
-
-const DivContainer = styled.div`
-    display : flex;
-    justify-content : flex-end;
-    padding-left : 5%;
-    padding-right : 5%;
-    p {
-        &:hover {
-            cursor : pointer;
-        }
-    }
-    img {
-        &:hover {
-            cursor : pointer;
-        }
-    }
-    .moment {
-        &:hover {
-            cursor : initial;
-        }
     }
 `
 
@@ -114,8 +56,6 @@ const PostContent = styled.div`
   }
 `;
 
-
-
 const QuillStyleDiv = styled.div`
     pre {
         background-color: #23241f;
@@ -135,40 +75,6 @@ const QuillStyleDiv = styled.div`
         padding-left: 16px;
     }
 `
-const DivEdit = styled.div`
-    display : flex; 
-    color : #777;
-
-    justify-content : flex-end;
-    margin : 10px 10px 0px 0px;
-
- .tagging {
-    justify-content : flex-start;
-    margin-left : 10vw;
-    }
-
- p {
-     cursor: pointer;
-     margin : 2px;
- }
-`
-const DivEditOne = styled.div`
-display : flex; 
-color : #777;
-
-margin : 10px 5vw 0px 4vw;
-justify-content : flex-start;
-`
-
-const StyledTags = styled(Typography.Text)`
-    font-size : 12px;
-
-    &:hover {
-        cursor: pointer;
-        color : #4e91cf;
-    }
-
-`
 
 moment.locale('ko')
 
@@ -177,15 +83,9 @@ const page = () => {
     const router = useRouter();
     const { id } = router.query;
     const { loginInfo } = useSelector((state) => state.user);
-    const { CoverUp, onePost : data, loadPostsError, submitCommentDone, submitCommentLoding, deleteCommentDone, deleteCommentLoding } = useSelector((state) => state.post);
+    const { CoverUp, onePost, loadPostsError, submitCommentDone, submitCommentLoding, deleteCommentDone, deleteCommentLoding } = useSelector((state) => state.post);
 
-    const [liker, setLiker] = useState({})
-
-    useEffect(() => {
-        setLiker(data?.Likers?.map(liker => liker?.id === loginInfo?.id ? liker : false).filter(v => v !== false)[0]);
-    },[data, loginInfo])
-
-
+ 
     useEffect(() => {
         dispatch({
             type : LOAD_ONE_POST_REQUEST,
@@ -194,11 +94,11 @@ const page = () => {
     },[loginInfo.id, submitCommentDone && !submitCommentLoding, deleteCommentDone && !deleteCommentLoding])
 
     useEffect(() => {
-        if(data === null) {
+        if(onePost === null) {
             message.error('존재하지않는 게시물...')
             Router.back();
         }
-    },[data])
+    },[onePost])
 
     useEffect(() => {
         loadPostsError && (() => {
@@ -207,31 +107,6 @@ const page = () => {
         })()
     },[loadPostsError])
     
-  const deletePost = useCallback((id) => () => {
-    dispatch({
-      type : DELETE_POST_REQUEST,
-      data : {
-        id
-      }
-    })
-  },[])
-
-    const searchHashtag = useCallback((tag) => () => {
-        dispatch({
-            type : HASHTAG_SEARCH_REQUEST,
-            data : {
-                name : encodeURIComponent(tag)
-            }
-        })
-        router.pathname.slice(1) && Router.replace('/')
-    },[])
-
-    const onClickMyInfo = useCallback(() => {
-        dispatch({
-            type : COVER_POST,
-            id : data?.UserId
-        })
-    },[data])    
 
     const onClickCoverDown = useCallback((e) => {
         CoverUp && dispatch({
@@ -239,109 +114,28 @@ const page = () => {
         })
     },[CoverUp])
 
-    const onClickLike = useCallback(() => {
-        if(!loginInfo.id) {
-          return message.warn('로그인 후 이용 가능합니다')
-        } else {
-          !liker && dispatch({
-            type : LIKE_POST_REQUEST,
-            id : data?.id
-          });
-          liker && dispatch({
-            type : UNLIKE_POST_REQUEST,
-            id : data?.id
-          })
-        }
-      },[liker, data, loginInfo]);
-
-
-    
-const flexDivMemo = useMemo(() => {
-    return {
-        display : 'flex',
-        alignItems : 'center'
-    }
-})
-
-const momentPMemo = useMemo(() => {
-    return { 
-        backgroundColor : '#777',
-        fontWeight :'200',
-        color : 'white',
-        marginRight : '5px',
-     }
-})
-
-const nicknamePMemo = useMemo(() => {
-    return { 
-        display : 'flex',
-        alignItems : 'center',
-        marginRight : '10px'
-    }
-})
-
-const avatarImgMemo = useMemo(() => {
-    return {
-        width : "32px",
-        height:'32px',
-        borderRadius : '50%'
-    }
-})
-
-const divEditContainerMemo = useMemo(() => {
-    return {
-        display : 'flex',
-        width : '100%',
-        justifyContent : 'space-between'
-    }
-})
-
-
-
     return (
         <MyLayout>
+           {onePost?.id ? <div onClick={onClickCoverDown}>
 
+            <Containertitle><h1>{onePost?.title}</h1></Containertitle>
 
-           {data?.id ? <div onClick={onClickCoverDown}>
-            <Containertitle><h1>{data?.title}</h1></Containertitle>
-            <DivContainer>
-    <div style={flexDivMemo}>
-            <p style={momentPMemo} className="moment">{moment(data?.createdAt).fromNow()}</p>
-            <p onClick={onClickMyInfo} style={nicknamePMemo}>{data?.User?.nickname}</p>
-            <img onClick={onClickMyInfo} style={avatarImgMemo}  src={`http://localhost:3055/${data?.User?.Images[0]?.src}`}/>
-    </div>
-            </DivContainer>
+            <PostPageSubInfo post={onePost} />
+
             <BorderDiv>
                <div className="bode"/>
             </BorderDiv>
-            <div style={divEditContainerMemo}>
-            <DivEditOne>
-                {data?.Hashtags?.map(v => <StyledTags onClick={searchHashtag(v?.name)} keyboard>{v?.name}</StyledTags>)}
-            </DivEditOne>
-            <div style={flexDivMemo}>
-                {data?.UserId === loginInfo?.id && 
-                <DivEdit>
-                    <p onClick={() => Router.replace(`/write?PostId=${parseInt(data.id, 10)}`)}>수정</p>
-                    <p>/</p>
-                    <p onClick={deletePost(data?.id)}>삭제</p>
-                </DivEdit>}
-                <ViewDiv>
-                <EyeOutlined className="viewicon"/>
-                <span>{data?.Views?.length}</span>
-                </ViewDiv>
 
+            <PostPageTagLike post={onePost}/>
 
-                <LikeDiv>
-                <HeartTwoTone onClick={onClickLike} className="heart" twoToneColor={liker?.id ? 'red' : 'gray'} />
-                <span>{data?.Likers?.length}</span>
-                </LikeDiv>
-            </div>
-            </div>
             <PostContent>
-            <QuillStyleDiv dangerouslySetInnerHTML={{__html : data?.content}}/>
+            <QuillStyleDiv dangerouslySetInnerHTML={{__html : onePost?.content}}/>
             </PostContent>
-            <CommentContainer post={data} user={loginInfo}/>
-            </div> : (<BorderDiv><h1>로딩중...</h1></BorderDiv>)}
+
+            <CommentContainer post={onePost} user={loginInfo}/>
+            
+            </div> : 
+            (<BorderDiv><h1>로딩중...</h1></BorderDiv>)}
         </MyLayout>
     )
 }

@@ -86,9 +86,6 @@ const StyledDivForTab = styled.div`
 
 `
 
-
-
-
 const InfomationUserPost = ({ User }) => {
     const [clicked, setClicked] = useState('글');
 
